@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Finaliser la commande</title>
+  <link rel="stylesheet" href="/style.css">
+    <link rel="icon" type="image" sizes="32x32" href="/uploads/Screenshot 2026-02-06 221810.png">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">🍴 Mohamed's Restaurant</div>
+     <nav><a href="/">Accueil</a></nav>
+     <button id="darkModeToggle">🌙 Mode Nuit</button>
+  </header>
+ 
+  <section class="checkout">
+    <div class="checkout-container">
+  <h2>Finaliser votre commande</h2>
+
+  <form action="/orders/checkout" method="POST">
+    <% cart.forEach((item, idx) => { %>
+          <li>
+            <div class="imgvali"><img src="<%= item.image %>" alt="<%= item.mealName %>" class="cart-img">
+            <h3> nom:<%= item.mealName %> </h3>
+            <h3> quantié :<%= item.quantity %>  </h3>
+                 <h3>prix :<%= item.lineTotal %> MAD </h3>
+                  </li>
+
+        <% }) %>
+
+        </div>
+        <p>Total: <%= cartTotal %> MAD</p>
+        <div class="vali">
+    <input type="text" name="firstName" placeholder="Prénom" required>
+    <input type="text" name="lastName" placeholder="Nom" required>
+    <input type="text" name="address" placeholder="Adresse" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="tel" name="phone" placeholder="Téléphone" required>
+    <input type="text" name="postalCode" placeholder="Code postal" required>
+   
+    <!-- Paiement cash/en ligne -->
+  <input type="hidden" name="paymentType" id="paymentType">
+
+  <!-- bouton cash -->
+  <button type="submit" onclick="document.getElementById('paymentType').value='cash'">
+    💵 Paiement cash à la livraison
+  </button>
+
+  <!-- bouton online -->
+  <form id="payOnlineForm">
+  <input type="hidden" id="cartTotal" value="<%= cartTotal %>">
+
+  <h3>Total à payer : <%= cartTotal %> €</h3>
+
+<a href="https://buy.stripe.com/test_xxxxxxxxx" target="_blank">
+    <button type="submit"  onclick="document.getElementById('paymentType').value='online'" >
+    💳 Payer en ligne
+  </button>
+</a>
+</form>
+
+<script>
+  document.getElementById('payOnlineForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const cartTotal = document.getElementById('cartTotal').value;
+
+    const response = await fetch('/pay-online', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ cartTotal })
+    });
+
+    const data = await response.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Erreur paiement');
+    }
+  });
+</script>
+
+
+
+    </div>
+  </form>
+
+</div>
+  </section>
+  <script>
+  const toggle = document.getElementById('darkModeToggle');
+  const body = document.body;
+  const header = document.querySelector('header.navbar');
+  const checkout = document.querySelector('section.checkout');
+
+  // Vérifier si le mode nuit est déjà activé
+  if(localStorage.getItem('darkMode') === 'enabled') {
+    enableDarkMode();
+  }
+
+  toggle.addEventListener('click', () => {
+    if(body.classList.contains('dark-mode')) {
+      disableDarkMode();
+    } else {
+      enableDarkMode();
+    }
+  });
+
+  function enableDarkMode() {
+    body.classList.add('dark-mode');
+    header.classList.add('dark-mode');
+    checkout.classList.add('dark-mode');
+    localStorage.setItem('darkMode', 'enabled');
+  }
+
+  function disableDarkMode() {
+    body.classList.remove('dark-mode');
+    header.classList.remove('dark-mode');
+    checkout.classList.remove('dark-mode');
+    localStorage.setItem('darkMode', 'disabled');
+  }
+</script>
+
+</body>
+</html>

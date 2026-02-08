@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mohamed's Restaurant</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" type="image" sizes="32x32" href="/uploads/Screenshot 2026-02-06 221810.png">
+</head>
+<body>
+  
+ 
+ 
+  <!-- Barre de navigation -->
+  <header class="navbar">
+    <div class="logo">🍴 Mohamed's Restaurant</div>
+    <!-- Barre de recherche -->
+  <section class="search">
+    <form method="GET" action="/">
+      <input type="text" name="q" placeholder="Rechercher un plat..." value="<%= query %>">
+      <select name="cat">
+        <option value="">Toutes catégories</option>
+        <option value="Pizza" <%= category==='Pizza'?'selected':'' %>>Pizza</option>
+        <option value="Dessert" <%= category==='Dessert'?'selected':'' %>>Dessert</option>
+        <option value="Boisson" <%= category==='Boisson'?'selected':'' %>>Boisson</option>
+        <option value="Traditionnel" <%= category==='Traditionnel'?'selected':'' %>>Traditionnel</option>
+      </select>
+      <button type="submit">🔍 Rechercher</button>
+    </form>
+  </section>
+    <!-- <a href="/meals/admin">Admin</a>-->
+    <nav class="nav-links" id="navLinks">
+    <a href="/">Accueil</a>
+    <button id="darkModeToggle">🌙 Mode Nuit</button>
+ <div class="secret-admin" id="secretAdmin">
+  Admin
+</div>
+
+   <script>
+  const adminZone = document.getElementById('secretAdmin');
+
+  adminZone.addEventListener('dblclick', () => {
+    window.location.href = '/admin-login';
+  });
+</script>
+  </nav>
+     <!-- Icône menu mobile -->
+   <div class="menu-toggle" id="menuToggle">
+    ☰
+  </div>
+</header>
+
+  <!-- Hero section -->
+  <section class="hero">
+    <h1>Bienvenue chez <span>Mohamed's Restaurant</span></h1>
+    <p>Découvrez nos plats raffinés, préparés avec passion et servis avec élégance.</p>
+  </section>
+
+  
+
+  <!-- Liste des plats -->
+   
+  <section class="menu">
+
+  <% meals.forEach(meal => { %>
+    <div class="card" onclick="openCard(this)">
+
+      <!-- IMAGE -->
+
+      <% if (meal.image) { %>
+        <img src="<%= meal.image %>" alt="<%= meal.name %>" >
+      <% } %>
+
+      <!-- VIDÉO -->
+      <% if (meal.video) { %>
+        <video src="<%= meal.video %>" controls style="max-width:100%"></video>
+      <% } %>
+
+      <h2><%= meal.name %></h2>
+      <p class="category">Catégorie : <%= meal.category %></p>
+      <p class="desc"><%= meal.description %></p>
+      <p class="price"><%= meal.price %> MAD</p>
+
+      <!-- Ajouter au panier -->
+      <form action="/orders/cart/add" method="POST">
+        <input type="hidden" name="mealId" value="<%= meal._id %>">
+        <input type="number" name="quantity" value="1" min="1">
+        <button type="submit">🛒 Ajouter au panier</button>
+      </form>
+
+    </div>
+  <% }) %>
+
+</section>
+
+  <!-- Panier -->
+  <section class="cart">
+    <h3>🛒 Mon panier</h3>
+    <% if (cart.length > 0) { %>
+      <ul>
+        <% cart.forEach((item, idx) => { %>
+          <li>
+            <img src="<%= item.image %>" alt="<%= item.mealName %>"class="cart-img">
+            
+            
+            <h3> nom:<%= item.mealName %> </h3>
+            <h3> quantié :<%= item.quantity %>  </h3>
+                 <h3>prix :<%= item.lineTotal %> MAD </h3>
+               
+            <form action="/orders/cart/remove" method="POST" style="display:inline; margin-left:10px;">
+              <input type="hidden" name="index" value="<%= idx %>">
+              <button type="submit" class="remove-btn">Supprimer</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+      <p>Total: <%= cartTotal %> MAD</p>
+      <form action="/orders/checkout" method="POST">
+       
+      <a href="/orders/checkout" class="btn">Commander</a>
+
+      </form>
+    <% } else { %>
+      <p>Votre panier est vide.</p>
+    <% } %>
+  </section>
+
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Mohamed's Restaurant — Fès, Maroc</p>
+  </footer>
+   <!--mode nuit -->
+   
+<script>
+  const toggle = document.getElementById('darkModeToggle');
+  const body = document.body;
+  const navbar = document.querySelector('header.navbar');
+  const hero = document.querySelector('section.hero');
+  const menu = document.querySelector('section.menu');
+  const cart = document.querySelector('section.cart');
+  const footer = document.querySelector('footer');
+
+  // Vérifier si le mode nuit est déjà activé
+  if(localStorage.getItem('darkMode') === 'enabled') {
+    enableDarkMode();
+  }
+
+  toggle.addEventListener('click', () => {
+    if(body.classList.contains('dark-mode')) {
+      disableDarkMode();
+    } else {
+      enableDarkMode();
+    }
+  });
+
+  function enableDarkMode() {
+    body.classList.add('dark-mode');
+    navbar.classList.add('dark-mode');
+    hero.classList.add('dark-mode');
+    menu.classList.add('dark-mode');
+    cart.classList.add('dark-mode');
+    footer.classList.add('dark-mode');
+    localStorage.setItem('darkMode', 'enabled');
+  }
+
+  function disableDarkMode() {
+    body.classList.remove('dark-mode');
+    navbar.classList.remove('dark-mode');
+    hero.classList.remove('dark-mode');
+    menu.classList.remove('dark-mode');
+    cart.classList.remove('dark-mode');
+    footer.classList.remove('dark-mode');
+    localStorage.setItem('darkMode', 'disabled');
+  }
+</script>
+<!-- pour 3 tire --->
+ <script>
+  const menuToggle = document.getElementById("menuToggle");
+  const navLinks = document.getElementById("navLinks");
+
+  menuToggle.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+  });
+</script>
+
+<div id="cardOverlay" onclick="closeCard()">close</div>
+
+  <!-- grandir la card-->
+<script>
+  let activeCard = null;
+
+  function openCard(card) {
+    activeCard = card;
+    card.classList.add("active");
+    document.getElementById("cardOverlay").classList.add("active");
+    document.body.classList.add("no-scroll");   // 🔥 bloque la page
+  }
+
+  function closeCard() {
+    if (activeCard) {
+      activeCard.classList.remove("active");
+      activeCard = null;
+    }
+    document.getElementById("cardOverlay").classList.remove("active");
+    document.body.classList.remove("no-scroll");
+  }
+</script>
+
+
+
+</body>
+</html>

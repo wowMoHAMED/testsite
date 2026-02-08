@@ -1,0 +1,20 @@
+<h2>Commandes reçues</h2>
+<ul>
+  <% orders.forEach(order => { %>
+    <li>
+      <strong><%= order.firstName %> <%= order.lastName %></strong>  
+      — <%= order.total %> MAD  
+      <p>Adresse : <%= order.address %></p>
+      <p>Téléphone : <%= order.phone %></p>
+      <p>Code postal : <%= order.postalCode %></p>
+      <p>Plats :</p>
+      <ul>
+        <% order.cart.forEach(item => { %>
+          <h3> nom:<%= item.mealName %> </h3>
+            <h3> quantié :<%= item.quantity %>  </h3>
+                 <h3>prix :<%= item.lineTotal %> MAD </h3>
+        <% }) %>
+      </ul>
+    </li>
+  <% }) %>
+</ul>
