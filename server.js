@@ -6,7 +6,7 @@ const path = require('path');
 const app = express();
 const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
-
+ 
 
 
 // View engine & static
@@ -32,7 +32,16 @@ app.use(session({
 }));
 
 // MongoDB connect (no legacy options)
-mongoose.connect('mongodb://localhost:27017/restaurantDB');
+mongoose.connect("mongodb+srv://chiguermohamed41_db_user:OOMQ6cPkqQL4hsmB@cluster23.nlm4h2d.mongodb.net/?appName=Cluster23");
+
+const conn=mongoose.connection;
+conn.once('open', () => {
+  console.log('MongoDB connection established successfully');
+});
+conn.on('error', (err) => { 
+  console.error('MongoDB connection error:', err);
+});
+
 // Routes
 const mealRoutes = require('./routes/meals');
 const orderRoutes = require('./routes/orders');
