@@ -227,4 +227,18 @@ app.get('/admin', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running → http://localhost:${PORT}`));
 
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
+// fichiers statiques
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// routes
+const routes = require("./routes/index.js");
+app.use("/", routes);
+
+
+// IMPORTANT POUR VERCEL
+module.exports = app;
