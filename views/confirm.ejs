@@ -2,13 +2,15 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Commande réussie</title>
   <link rel="stylesheet" href="/style.css">
     <link rel="icon" type="image" sizes="32x32" href="/uploads/Screenshot 2026-02-06 221810.png">
 </head>
 <body>
       <header class="navbar">
-              <div class="logo">🍴 Mohamed's Restaurant</div>
+              <div class="logo">🍴 Chiguer Restaurant</div>
      <nav>
 
      <a href="/">Accueil</a>
@@ -18,6 +20,7 @@
   
 <section class="confirmation">
   <h2>✅ votre commande est effectué Merci!</h2>
+  <h3>attendez vous le contact de livreur Merci!</h3>
   <form action="/orders/payment" method="POST">
  
 <% cart.forEach((item, idx) => { %>

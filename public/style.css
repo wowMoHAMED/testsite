@@ -69,8 +69,8 @@ body{
   text-align:center;
   padding:48px 0 24px;
 }
-.hero h1{font-size:32px; margin:0 0 8px;}
-.hero p{color:var(--muted); margin:0 auto 12px; max-width:720px;}
+.hero h1{font-size:50px; margin:0 0 8px;}
+.hero p{color:rgb(181, 119, 5); margin:0 auto 12px; max-width:720px;}
 
 /* Search */
 .search{display:flex; justify-content:center; margin-bottom:20px;}
@@ -442,13 +442,12 @@ display: flex;
 .btn-cash { background: #27ae60; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; } .btn-pay { background: #2980b9; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; }
 
 .secret-admin {
-  position: absolute;
-  top: 0;
+  
   left:80px;
   width: 60px;
-  height: 40px;
+  
   display: inline;
-  opacity: 0;      
+  opacity: 1;      
   cursor:default
 }
 /* =========================
@@ -602,13 +601,7 @@ body {
 }
 
 /* image bien cadrée */
-.card img,
-.card video {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 12px;
-}
+
 
 /* titre */
 .card h2 {
@@ -836,6 +829,15 @@ footer {
   padding: 20px;
   margin-top: 60px;
   font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+footer a {
+  color: #ddd;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 /* =========================
@@ -917,10 +919,9 @@ footer {
 .card img,
 .card video {
   width: 100%;
-  height: 200px;
+  height: 160px;
   object-fit: cover;
-  border-bottom: 2px solid #ff6f61;
-  border-radius: 0;
+  border-radius: 12px;
 }
 
 /* Responsive images */
@@ -1318,76 +1319,92 @@ margin-top: 0px;
     font-size: 18px;
   }
 }
-/* card css */
-/* ================================
-   ZOOM CARD AU CENTRE
-================================ */
+/****************************************************************'*******/
+/* =========================
+   RESPONSIVE POUR MOBILE / TABLETTE
+========================= */
+@media (max-width: 1024px) {
+  /* Menu hamburger visible et en haut à droite */
+  .menu-toggle {
+    display: block;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    z-index: 1000;
+  }
 
-/* Overlay sombre */
-#cardOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  opacity: 0;
-  visibility: hidden;
-  transition: 0.3s ease;
-  z-index: 50;
-   position: fixed;
+  .nav-links {
+    display: none; /* caché par défaut */
+    position: absolute;
+    top: 60px; /* juste en dessous du header */
+    right: 20px;
+    flex-direction: column;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 5px;
+    gap: 10px;
+    z-index: 999;
+  }
 
-  z-index: 2000;
+  .nav-links.active {
+    display: flex; /* s'affiche quand on clique sur hamburger */
+  }
+
+  /* Hero section responsive */
+  section.hero {
+    padding: 30px 10px;
+  }
+
+  /* Menu des plats responsive */
+  section.menu {
+    display: grid;
+    grid-template-columns: 1fr; /* une seule colonne sur mobile/tablette */
+    gap: 15px;
+    padding: 10px;
+  }
+
+  /* Cartes des plats s'adaptent */
+  .card {
+    max-height: none; /* enlever limite pour mobile */
+  }
+
+  /* Panier responsive */
+  section.cart li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
-/* Card normale */
-.card {
-  cursor: pointer;
-  transition: all 0.4s ease;
+/* Pour les petits téléphones (ex: 480px) */
+@media (max-width: 480px) {
+  .menu-toggle {
+    font-size: 1.5rem;
+    top: 10px;
+    right: 15px;
+  }
+
+  section.hero h1 {
+    font-size: 1.5rem;
+  }
+
+  section.hero p {
+    font-size: 0.9rem;
+  }
+
+  .card h2 {
+    font-size: 1rem;
+  }
+
+  .card p {
+    font-size: 0.8rem;
+  }
+
+  .card form button {
+    padding: 4px 8px;
+  }
 }
 
-/* Card active (zoom + centre) */
-.card.active {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(1.15);
-  width: 500px;
-  max-width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  z-index: 100;
-  background: #fff;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-  border-radius: 16px;
-  padding-bottom: 20px;
-   position: fixed;
-
-  z-index: 3000;  
-}
-
-/* Mode nuit compatible */
-body.dark-mode .card.active {
-  background: #1e1e1e;
-  color: #fff;
-}
-
-/* Overlay visible */
-#cardOverlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Amélioration lisibilité */
-.card.active h2 {
-  font-size: 24px;
-}
-
-.card.active .desc {
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-.card.active img,
-.card.active video {
-  border-radius: 12px;
-}
 
 
