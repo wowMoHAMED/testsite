@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Meal = require('../models/Meal');
+const multer = require("multer");
+const cloudinary = require("../config/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
 
 // Admin page
 router.get('/admin', async (req, res) => {
@@ -18,22 +22,19 @@ router.get('/chef', (req, res) => res.redirect('/meals/admin'));
 
 // Create
 
-
-const multer = require('multer');
 const path = require('path');
 
 
-// Config stockage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/uploads'); // dossier accessible publiquement
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "restaurant",
+    allowed_formats: ["jpg", "png", "jpeg", "mp4"]
   }
 });
 
 const upload = multer({ storage });
+
 
 // ✅ Route ajout plat (déjà OK)
 router.post(
@@ -44,24 +45,28 @@ router.post(
   ]),
   async (req, res) => {
 
-    console.log("FILES ===>", req.files);
-    console.log("BODY ===>", req.body);
+    try {
 
-    const imagePath = req.files?.image
-      ? "/uploads/" + req.files.image[0].filename
-      : "";
+      const imagePath = req.files?.image
+        ? req.files.image[0].path
+        : "";
 
-    const videoPath = req.files?.video
-      ? "/uploads/" + req.files.video[0].filename
-      : "";
+      const videoPath = req.files?.video
+        ? req.files.video[0].path
+        : "";
 
-    await Meal.create({
-      ...req.body,
-      image: imagePath,
-      video: videoPath
-    });
+      await Meal.create({
+        ...req.body,
+        image: imagePath,
+        video: videoPath
+      });
 
-    res.redirect("/meals/admin");
+      res.redirect("/meals/admin");
+
+    } catch (error) {
+      console.log(error);
+      res.send("Erreur lors de l'ajout du plat");
+    }
   }
 );
 

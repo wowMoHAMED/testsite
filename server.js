@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -6,9 +7,9 @@ const path = require('path');
 const app = express();
 const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
+
+
  
-
-
 // View engine & static
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
