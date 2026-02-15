@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>chiguer Restaurant</title>
+  <title>chiguer phone</title>
   <link rel="stylesheet" href="/style.css">
-  <link rel="icon" type="image" sizes="32x32" href="/uploads/Screenshot 2026-02-06 221810.png">
+  <link rel="icon" type="image" sizes="32x32" href="uploads/istockphoto-1057455004-612x612-removebg-preview.png">
 </head>
 <body>
   
@@ -14,27 +14,31 @@
  
   <!-- Barre de navigation -->
   <header class="navbar">
-    <div class="logo">🍴 Chiguer Restaurant</div>
+    <div class="tt">
+    <img src="uploads/istockphoto-1057455004-612x612-removebg-preview.png" alt="Logo"   ></div>
+    <div class="logo" >Chiguer's phone</div>
     <!-- Barre de recherche -->
   <section class="search">
     <form method="GET" action="/">
       <input type="text" name="q" placeholder="Rechercher un plat..." value="<%= query %>">
       <select name="cat">
         <option value="">Toutes catégories</option>
-        <option value="Pizza" <%= category==='Pizza'?'selected':'' %>>Pizza</option>
-        <option value="Dessert" <%= category==='Dessert'?'selected':'' %>>Dessert</option>
-        <option value="Boisson" <%= category==='Boisson'?'selected':'' %>>Boisson</option>
-        <option value="Traditionnel" <%= category==='Traditionnel'?'selected':'' %>>Traditionnel</option>
+        <option value="android" <%= category==='android'?'selected':'' %>>android</option>
+        <option value="iphone" <%= category==='iphone'?'selected':'' %>>iphone</option>
+        <option value="sumsung" <%= category==='sumsung'?'selected':'' %>>sumsung</option>
+        <option value="huawei" <%= category==='huawei'?'selected':'' %>>huawei</option>
       </select>
-      <button type="submit">🔍 Rechercher</button>
+      <div class="serch_logo">
+      <button type="submit"><img src="uploads/pngtree-magnifying-glass-icon-image_1128382-removebg-preview.png" alt="search"  ></button>
+      </div>
     </form>
   </section>
     <!-- <a href="/meals/admin">Admin</a>-->
     <nav class="nav-links" id="navLinks">
     <a href="/">Accueil</a>
-    <button id="darkModeToggle">🌙 Mode Nuit</button>
+    <button id="darkModeToggle">🌙 nuit</button>
  <div class="secret-admin" id="secretAdmin">
-  Admin
+  <img src="uploads/cercle-bleu-vecteur-utilisateur-blanc_941526-5758-removebg-preview.png" alt="admin" >
 </div>
 
 <!----><script>
@@ -53,8 +57,8 @@
 
   <!-- Hero section -->
   <section class="hero">
-    <h1>Bienvenue chez <span>Chiguer's Restaurant</span></h1>
-    <p>Découvrez nos plats raffinés, préparés avec passion et servis avec élégance.</p>
+    <h2>Bienvenue chez <span>Chiguer's Phone</span></h2>
+    <p>Découvrez nos produits de bonne qualité et de prix abordable.</p>
   </section>
 
   
@@ -104,9 +108,9 @@
             <img src="<%= item.image %>" alt="<%= item.mealName %>"class="cart-img">
             
             
-            <h3> nom:<%= item.mealName %> </h3>
-            <h3> quantié :<%= item.quantity %>  </h3>
-                 <h3>prix :<%= item.lineTotal %> MAD </h3>
+            <h3> nom : <%= item.mealName %> </h3>
+            <h3> quantié : <%= item.quantity %>  </h3>
+                 <h3>prix : <%= item.lineTotal %> MAD </h3>
                
             <form action="/orders/cart/remove" method="POST" style="display:inline; margin-left:10px;">
               <input type="hidden" name="index" value="<%= idx %>">
@@ -130,8 +134,8 @@
 
   <!-- Footer -->
   <footer>
-    <p>contact us by: 0657274965</p>
-    <p>&copy; 2026 Chiguer's Restaurant — Fès, Maroc</p>
+    <p>contact us: 0657274965</p>
+    <p>&copy; 2026 Chiguer's Phone — Fès, Maroc</p>
 <a href="https://mail.google.com/mail/?view=cm&to=chiguermohamed18@gmail.com&su=Bonjour&body=Votre message ici" target="_blank">
   Envoyer un message via Gmail
 </a>
@@ -183,12 +187,32 @@
 </script>
 <!-- pour 3 tire --->
  <script>
-  const menuToggle = document.getElementById("menuToggle");
-  const navLinks = document.getElementById("navLinks");
+  // Sélection des éléments
+const menuToggle = document.getElementById("menuToggle");
+const navLinks = document.getElementById("navLinks");
 
-  menuToggle.addEventListener("click", () => {
-    navLinks.classList.toggle("active");
+// État du menu : ouvert ou fermé
+let menuOpen = false;
+
+// Quand on clique sur le toggle
+menuToggle.addEventListener("click", () => {
+  menuOpen = !menuOpen; // on inverse l'état
+  if (menuOpen) {
+    navLinks.classList.add("active"); // ouvre le menu
+  } else {
+    navLinks.classList.remove("active"); // ferme le menu
+  }
+});
+
+// Optionnel : si tu veux fermer le menu quand on clique sur un lien
+const navItems = navLinks.querySelectorAll("a, button, .secret-admin");
+navItems.forEach(item => {
+  item.addEventListener("click", () => {
+    navLinks.classList.remove("active");
+    menuOpen = false;
   });
+});
+
 </script>
 
 <div id="cardOverlay" onclick="closeCard()">close</div>

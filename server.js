@@ -250,5 +250,6 @@ const routes = require("./routes/index.js");
 app.use("/", routes);
 
 
+
 // IMPORTANT POUR VERCEL
 module.exports = app;

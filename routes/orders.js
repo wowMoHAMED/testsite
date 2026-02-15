@@ -77,19 +77,18 @@ router.get('/checkout', (req, res) => {
 });
 
 // Valider la commande et enregistrer en base
-// Valider la commande et enregistrer en base
 router.post('/checkout', async (req, res) => {
   try {
-    const { firstName, lastName, address, email, phone, postalCode, paymentType } = req.body;
-    const cart = req.session.cart || [];
-    if (cart.length === 0) return res.redirect('/');
+    const { firstName, lastName, address, email, phone, postalCode, paymentType, cartItems } = req.body;
 
-    const cartTotal = cart.reduce((sum, item) => sum + item.lineTotal, 0);
+    if (!cartItems || cartItems.length === 0) return res.redirect('/');
 
-    // ✅ compter les commandes existantes
+    const cart = Array.isArray(cartItems) ? cartItems : Object.values(cartItems);
+
+    const total = cart.reduce((sum, item) => sum + Number(item.lineTotal), 0);
+
     const count = await Order.countDocuments();
 
-    // ✅ créer la nouvelle commande avec numéro incrémenté
     const newOrder = await Order.create({
       firstName,
       lastName,
@@ -98,38 +97,24 @@ router.post('/checkout', async (req, res) => {
       phone,
       postalCode,
       cart,
-      total: cartTotal,
-      orderNumber: count + 1 , 
-      paymentType
-       // ← numéro clair
-    });
-
-    req.session.cart = [];
-
-    res.render('confirm', {
-      firstName,
-      lastName,
-      address,
-      email,
-      phone,
-      postalCode,
-      cart,
+      total,
       paymentType,
-      order: req.session.order,
-      total: cartTotal,
-      createdAt: newOrder.createdAt,
-      orderNumber: newOrder.orderNumber 
-      // ← numéro lisible
+      orderNumber: count + 1
     });
 
+    // ✅ Ne pas vider le panier ici pour le moment
+    // req.session.cart = [];
 
-    
+    res.render('confirm', { order: newOrder });
 
   } catch (err) {
     console.error('Erreur lors de la sauvegarde de la commande', err);
     res.status(500).send('Erreur interne');
   }
 });
+
+
+
 
 // Admin commandes
 router.get('/commandes', async (req, res) => {

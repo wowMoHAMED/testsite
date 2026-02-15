@@ -24,12 +24,21 @@ router.get('/chef', (req, res) => res.redirect('/meals/admin'));
 
 const path = require('path');
 
-
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "restaurant",
-    allowed_formats: ["jpg", "png", "jpeg", "mp4"]
+  params: async (req, file) => {
+
+    let resourceType = "image";
+
+    // si le fichier est une vidéo
+    if (file.mimetype.startsWith("video")) {
+      resourceType = "video";
+    }
+
+    return {
+      folder: "restaurant",
+      resource_type: resourceType
+    };
   }
 });
 
