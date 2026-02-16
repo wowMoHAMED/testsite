@@ -24,6 +24,10 @@ app.use("/auth", authRoutes);
 
 
 
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
 
 // Sessions (simple demo)
 app.use(session({
@@ -233,9 +237,6 @@ app.get('/admin', async (req, res) => {
 
 //fin de verification admin
 
- 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running → http://localhost:${PORT}`));
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -249,6 +250,8 @@ app.use(express.json());
 const routes = require("./routes/index.js");
 app.use("/", routes);
 
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Serveur démarré sur http://localhost:${PORT}`));
 
 
 // IMPORTANT POUR VERCEL

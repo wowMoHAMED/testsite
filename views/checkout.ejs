@@ -44,11 +44,10 @@
         <h3>Prix: <%= item.lineTotal %> MAD</h3>
       </div>
 
-      <!-- Passer chaque item dans un input caché -->
       <input type="hidden" name="cartItems[<%= idx %>][mealName]" value="<%= item.mealName %>">
-      <input type="hidden" name="cartItems[<%= idx %>][quantity]" value="<%= item.quantity %>">
-      <input type="hidden" name="cartItems[<%= idx %>][lineTotal]" value="<%= item.lineTotal %>">
-      <input type="hidden" name="cartItems[<%= idx %>][image]" value="<%= item.image %>">
+    <input type="hidden" name="cartItems[<%= idx %>][quantity]" value="<%= item.quantity %>">
+    <input type="hidden" name="cartItems[<%= idx %>][lineTotal]" value="<%= item.lineTotal %>">
+    <input type="hidden" name="cartItems[<%= idx %>][image]" value="<%= item.image %>">
 
   <% }) %>
 
@@ -63,52 +62,14 @@
     <input type="text" name="postalCode" placeholder="Code postal" required>
   </div>
 
-  <!-- Paiement cash/en ligne -->
-  <input type="hidden" name="paymentType" id="paymentType">
+  <input type="hidden" name="paymentType" value="cash">
 
-  <!-- Bouton cash -->
-  <button type="submit" onclick="document.getElementById('paymentType').value='cash'">
+  <button type="submit">
     💵 Paiement cash à la livraison
   </button>
-
 </form>
-
-  <!-- bouton online -->
-  <form id="payOnlineForm">
-  <input type="hidden" id="cartTotal" value="<%= cartTotal %>">
 
   <h3>Total à payer : <%= cartTotal %> MAD</h3>
-
-<a href="https://buy.stripe.com/test_xxxxxxxxx" target="_blank">
-    <button type="submit"  onclick="document.getElementById('paymentType').value='online'" >
-    💳 Payer en ligne
-  </button>
-</a>
-</form>
-
-<script>
-  document.getElementById('payOnlineForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const cartTotal = document.getElementById('cartTotal').value;
-
-    const response = await fetch('/pay-online', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ cartTotal })
-    });
-
-    const data = await response.json();
-
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      alert('Erreur paiement');
-    }
-  });
-</script>
 
 
 

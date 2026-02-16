@@ -83,6 +83,7 @@ router.post('/checkout', async (req, res) => {
 
     if (!cartItems || cartItems.length === 0) return res.redirect('/');
 
+    // convertir cartItems en array (si nécessaire)
     const cart = Array.isArray(cartItems) ? cartItems : Object.values(cartItems);
 
     const total = cart.reduce((sum, item) => sum + Number(item.lineTotal), 0);
@@ -102,9 +103,7 @@ router.post('/checkout', async (req, res) => {
       orderNumber: count + 1
     });
 
-    // ✅ Ne pas vider le panier ici pour le moment
-    // req.session.cart = [];
-
+    // plus besoin de req.session.cart = []
     res.render('confirm', { order: newOrder });
 
   } catch (err) {
@@ -112,8 +111,7 @@ router.post('/checkout', async (req, res) => {
     res.status(500).send('Erreur interne');
   }
 });
-
-
+ 
 
 
 // Admin commandes
