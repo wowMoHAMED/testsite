@@ -4,6 +4,7 @@ const Order = require('../models/Order');
 const Meal = require('../models/Meal');
 const PDFDocument = require('pdfkit');
 
+
 // Admin: list orders
 router.get('/admin', async (req, res) => {
   const orders = await Order.find().sort({ createdAt: -1 });
@@ -69,104 +70,73 @@ router.post('/cart/remove', (req, res) => {
   }
 });
 
+
+const mongoose = require('mongoose');
+
+// Schema commande
+const orderSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  address: String, 
+  email: String,
+  phone: String,
+  postalCode: String,
+  cart: Array,
+  total: Number,
+  paymentType: String,
+  orderNumber: Number,
+  createdAt: { type: Date, default: Date.now }
+});
+
+
+
 // Checkout page
 router.get('/checkout', (req, res) => {
   const cart = req.session.cart || [];
-  const cartTotal = cart.reduce((sum, item) => sum + item.lineTotal, 0);
+  const cartTotal = cart.reduce((sum, item) => sum + Number(item.lineTotal), 0);
   res.render('checkout', { cart, cartTotal });
 });
 
-// Valider la commande et enregistrer en base
-// Valider la commande et enregistrer en base
+// Valider la commande
 router.post('/checkout', async (req, res) => {
   try {
-    // On vérifie si req.body existe
-    if (!req.body) {
-      return res.status(400).send("Formulaire vide");
-    }
-
     const { firstName, lastName, address, email, phone, postalCode, paymentType } = req.body;
+    const cart = req.session.cart || [];
 
-    // parser le panier
-    let cart = [];
-    try {
-      cart = JSON.parse(req.body.cartItemsData || '[]');
-    } catch (e) {
-      console.error("Erreur JSON parse panier", e);
-      return res.status(400).send("Panier invalide");
-    }
+    if (!cart.length) return res.redirect('/orders/checkout');
 
-    if (!cart.length) return res.redirect('/');
-
-    const total = cart.reduce((sum, item) => sum + Number(item.lineTotal || 0), 0);
+    const total = cart.reduce((sum, item) => sum + Number(item.lineTotal), 0);
     const count = await Order.countDocuments();
 
     const newOrder = await Order.create({
-      firstName,
-      lastName,
-      address,
-      email,
-      phone,
-      postalCode,
-      cart,
-      total,
-      paymentType,
+      firstName, lastName, address, email, phone, postalCode,
+      cart, total, paymentType,
       orderNumber: count + 1
     });
 
-    if (req.session) req.session.cart = [];
+    // Vider le panier après la commande
+    req.session.cart = [];
 
+    // Rediriger vers confirm.ejs
     res.render('confirm', { order: newOrder });
   } catch (err) {
-    console.error("Erreur lors de la sauvegarde de la commande", err);
-    res.status(500).send("Erreur");
+    console.error('Erreur lors de la commande', err);
+    res.status(500).send('Erreur interne');
   }
 });
-// Admin commandes
+
+// Page commandes admin
 router.get('/commandes', async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.render('commandes', { orders });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Erreur serveur");
+    res.status(500).send('Erreur serveur');
   }
 });
 
-// ✅ Partie PDF conservée
-router.get('/commandes/pdf', async (req, res) => {
-  try {
-    const orders = await Order.find().sort({ createdAt: -1 });
 
-    const doc = new PDFDocument();
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=commandes.pdf');
-    doc.pipe(res);
-
-    doc.fontSize(18).text('Liste des commandes', { align: 'center' });
-    doc.moveDown();
-
-    orders.forEach(order => {
-      doc.fontSize(12).text(`Client: ${order.firstName} ${order.lastName}`);
-      doc.text(`Adresse: ${order.address}`);
-      doc.text(`Email: ${order.email}`);
-      doc.text(`Téléphone: ${order.phone}`);
-      doc.text(`Date: ${new Date(order.createdAt).toLocaleString()}`);
-      doc.text(`Total: ${order.total} MAD`);
-      doc.text('Plats:');
-      order.cart.forEach(item => {
-        doc.text(`- ${item.mealName} (${item.quantity} x ${item.unitPrice} MAD = ${item.lineTotal} MAD)`);
-      });
-      doc.moveDown();
-    });
-
-    doc.end();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erreur lors de la génération du PDF");
-  }
-});
-//uploud fichier 
 const multer = require("multer");
 
 const storage = multer.diskStorage({

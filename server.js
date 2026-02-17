@@ -7,7 +7,7 @@ const path = require('path');
 const app = express();
 const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
-require('dotenv').config(); // <-- obligatoire pour charger .env
+// <-- obligatoire pour charger .env
 
 
 const ordersRouter = require('./routes/orders'); // Vérifie le chemin exact
@@ -23,7 +23,7 @@ app.use('/uploads', express.static('public/uploads'));
 const mealsRouter = require('./routes/meals');
 app.use('/meals', mealsRouter);
 const authRoutes = require("./routes/auth");
-app.use("/auth", authRoutes);
+app.use("/auth", authRoutes); 
 
 
 
@@ -49,7 +49,6 @@ app.use('/orders', ordersRouter);
 
 // Serveur
 
-app.listen(3000, () => console.log(`Serveur démarré sur http://localhost:3000`));
 // Routes
 const mealRoutes = require('./routes/meals');
 const orderRoutes = require('./routes/orders');
@@ -256,8 +255,7 @@ app.use("/", routes);
 
 
 // IMPORTANT POUR VERCEL
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Serveur démarré sur http://localhost:${PORT}`));
+
 
 
 

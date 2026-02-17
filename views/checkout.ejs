@@ -1,115 +1,47 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finaliser la commande</title>
-  <link rel="stylesheet" href="/style.css">
-  <link rel="icon" type="image" sizes="32x32" href="uploads/istockphoto-1057455004-612x612-removebg-preview.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout</title>
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header class="navbar">
-    <div class="logo">Chiguer's phone</div>
-    <nav class="nav-links" id="navLinks">
-      <a href="/">Accueil</a>
-      <button id="darkModeToggle">🌙 Mode Nuit</button>
-    </nav>
-    <div class="menu-toggle" id="menuToggle">☰</div>
-  </header>
+<h2>Finaliser votre commande</h2>
 
-  <section class="checkout">
-    <div class="checkout-container">
-      <h2>Finaliser votre commande</h2>
+<form action="/orders/checkout" method="POST">
 
-      <!-- Formulaire unique -->
-      <form action="/orders/checkout" method="POST">
-        <!-- Affichage du panier -->
-        <% cart.forEach((item, idx) => { %>
-          <div class="imgvali">
-            <img src="<%= item.image %>" alt="<%= item.mealName %>" class="cart-img">
-            <h3>Nom: <%= item.mealName %></h3>
-            <h3>Quantité: <%= item.quantity %></h3>
-            <h3>Prix: <%= item.lineTotal %> MAD</h3>
-          </div>
-        <% }) %>
+  <% if(cart.length === 0) { %>
+    <p>Votre panier est vide</p>
+  <% } else { %>
+    <% cart.forEach((item, idx) => { %>
+      <div>
+        <p><strong><%= item.mealName %></strong></p>
+        <p>Quantité: <%= item.quantity %></p>
+        <p>Prix: <%= item.lineTotal %> MAD</p>
+        <input type="hidden" name="cartItems[<%= idx %>][mealName]" value="<%= item.mealName %>">
+        <input type="hidden" name="cartItems[<%= idx %>][quantity]" value="<%= item.quantity %>">
+        <input type="hidden" name="cartItems[<%= idx %>][lineTotal]" value="<%= item.lineTotal %>">
+        <input type="hidden" name="cartItems[<%= idx %>][image]" value="<%= item.image %>">
+      </div>
+    <% }) %>
 
-        <!-- Infos client -->
-        <div class="vali">
-          <input type="text" name="firstName" placeholder="Prénom" required>
-          <input type="text" name="lastName" placeholder="Nom" required>
-          <input type="text" name="address" placeholder="Adresse" required>
-          <input type="email" name="email" placeholder="Email" required>
-          <input type="tel" name="phone" placeholder="Téléphone" required>
-          <input type="text" name="postalCode" placeholder="Code postal" required>
-        </div>
+    <h3>Total: <%= cartTotal %> MAD</h3>
 
-        <!-- Paiement cash -->
-        <input type="hidden" name="paymentType" value="cash">
-
-        <!-- Panier JSON envoyé en champ caché -->
-        <input type="hidden" name="cartItemsData" id="cartItemsData">
-
-        <button type="submit">💵 Paiement cash à la livraison</button>
-      </form>
-
-      <h3>Total à payer : <%= cartTotal %> MAD</h3>
+    <div>
+      <input type="text" name="firstName" placeholder="Prénom" required>
+      <input type="text" name="lastName" placeholder="Nom" required>
+      <input type="text" name="address" placeholder="Adresse" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="tel" name="phone" placeholder="Téléphone" required>
+      <input type="text" name="postalCode" placeholder="Code postal" required>
     </div>
-  </section>
 
-  <!-- Script pour remplir le panier caché -->
-  <script>
-    const cartData = <%- JSON.stringify(cart || []) %>;
-    document.getElementById("cartItemsData").value = JSON.stringify(cartData);
-  </script>
+    <input type="hidden" name="paymentType" value="cash">
 
-  <!-- Dark mode -->
-  <script>
-    const toggle = document.getElementById('darkModeToggle');
-    const body = document.body;
-    const header = document.querySelector('header.navbar');
-    const checkout = document.querySelector('section.checkout');
+    <button type="submit">💵 Paiement cash à la livraison</button>
+  <% } %>
 
-    if(localStorage.getItem('darkMode') === 'enabled') enableDarkMode();
-
-    toggle.addEventListener('click', () => {
-      if(body.classList.contains('dark-mode')) disableDarkMode();
-      else enableDarkMode();
-    });
-
-    function enableDarkMode() {
-      body.classList.add('dark-mode');
-      header.classList.add('dark-mode');
-      checkout.classList.add('dark-mode');
-      localStorage.setItem('darkMode', 'enabled');
-    }
-
-    function disableDarkMode() {
-      body.classList.remove('dark-mode');
-      header.classList.remove('dark-mode');
-      checkout.classList.remove('dark-mode');
-      localStorage.setItem('darkMode', 'disabled');
-    }
-  </script>
-
-  <!-- Navbar toggle -->
-  <script>
-    const menuToggle = document.getElementById("menuToggle");
-    const navLinks = document.getElementById("navLinks");
-    let menuOpen = false;
-
-    menuToggle.addEventListener("click", () => {
-      menuOpen = !menuOpen;
-      if(menuOpen) navLinks.classList.add("active");
-      else navLinks.classList.remove("active");
-    });
-
-    const navItems = navLinks.querySelectorAll("a, button, .secret-admin");
-    navItems.forEach(item => {
-      item.addEventListener("click", () => {
-        navLinks.classList.remove("active");
-        menuOpen = false;
-      });
-    });
-  </script>
+</form>
 </body>
 </html>
