@@ -77,17 +77,28 @@ router.get('/checkout', (req, res) => {
 });
 
 // Valider la commande et enregistrer en base
+// Valider la commande et enregistrer en base
 router.post('/checkout', async (req, res) => {
   try {
-    const { firstName, lastName, address, email, phone, postalCode, paymentType, cartItems } = req.body;
+    // On vérifie si req.body existe
+    if (!req.body) {
+      return res.status(400).send("Formulaire vide");
+    }
 
-    if (!cartItems || cartItems.length === 0) return res.redirect('/');
+    const { firstName, lastName, address, email, phone, postalCode, paymentType } = req.body;
 
-    // convertir cartItems en array (si nécessaire)
-    const cart = Array.isArray(cartItems) ? cartItems : Object.values(cartItems);
+    // parser le panier
+    let cart = [];
+    try {
+      cart = JSON.parse(req.body.cartItemsData || '[]');
+    } catch (e) {
+      console.error("Erreur JSON parse panier", e);
+      return res.status(400).send("Panier invalide");
+    }
 
-    const total = cart.reduce((sum, item) => sum + Number(item.lineTotal), 0);
+    if (!cart.length) return res.redirect('/');
 
+    const total = cart.reduce((sum, item) => sum + Number(item.lineTotal || 0), 0);
     const count = await Order.countDocuments();
 
     const newOrder = await Order.create({
@@ -103,17 +114,14 @@ router.post('/checkout', async (req, res) => {
       orderNumber: count + 1
     });
 
-    // plus besoin de req.session.cart = []
-    res.render('confirm', { order: newOrder });
+    if (req.session) req.session.cart = [];
 
+    res.render('confirm', { order: newOrder });
   } catch (err) {
-    console.error('Erreur lors de la sauvegarde de la commande', err);
-    res.status(500).send('Erreur interne');
+    console.error("Erreur lors de la sauvegarde de la commande", err);
+    res.status(500).send("Erreur");
   }
 });
- 
-
-
 // Admin commandes
 router.get('/commandes', async (req, res) => {
   try {

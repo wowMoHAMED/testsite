@@ -7,7 +7,10 @@ const path = require('path');
 const app = express();
 const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
+require('dotenv').config(); // <-- obligatoire pour charger .env
 
+
+const ordersRouter = require('./routes/orders'); // Vérifie le chemin exact
 
  
 // View engine & static
@@ -36,17 +39,17 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// MongoDB connect (no legacy options)
-mongoose.connect("mongodb+srv://chiguermohamed41_db_user:OOMQ6cPkqQL4hsmB@cluster23.nlm4h2d.mongodb.net/?appName=Cluster23");
+// Connexion MongoDB (Mongoose 7+)
+mongoose.connect(process.env.MONGODB_URL)
+  .then(() => console.log('MongoDB connection established successfully'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-const conn=mongoose.connection;
-conn.once('open', () => {
-  console.log('MongoDB connection established successfully');
-});
-conn.on('error', (err) => { 
-  console.error('MongoDB connection error:', err);
-});
+// Routes
+app.use('/orders', ordersRouter);
 
+// Serveur
+
+app.listen(3000, () => console.log(`Serveur démarré sur http://localhost:3000`));
 // Routes
 const mealRoutes = require('./routes/meals');
 const orderRoutes = require('./routes/orders');
@@ -253,32 +256,9 @@ app.use("/", routes);
 
 
 // IMPORTANT POUR VERCEL
-app.post("/orders/checkout", async (req, res) => {
-  try {
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Serveur démarré sur http://localhost:${PORT}`));
 
-    console.log("BODY:", req.body); // IMPORTANT POUR TEST
-
-    const nouvelleCommande = new Commande({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      address: req.body.address,
-      email: req.body.email,
-      phone: req.body.phone,
-      postalCode: req.body.postalCode,
-      paymentType: req.body.paymentType,
-      cartItems: req.body.cartItems
-    });
-
-    await nouvelleCommande.save();
-
-    res.redirect("/confirm");
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erreur commande");
-  }
-});
- 
 
 
 module.exports = app;
