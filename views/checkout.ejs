@@ -33,7 +33,7 @@
     <div class="checkout-container">
   <h2>Finaliser votre commande</h2>
 
-<form action="/orders/checkout" method="POST">
+<form action="/orders/checkout" method="POST" enctype="multipart/form-data">
 
   <% cart.forEach((item, idx) => { %>
     <li>
@@ -62,12 +62,17 @@
     <input type="text" name="postalCode" placeholder="Code postal" required>
   </div>
 
-  <input type="hidden" name="paymentType" value="cash">
+  <!-- Paiement cash/en ligne -->
+  <input type="hidden" name="paymentType" id="paymentType">
 
-  <button type="submit">
+  <!-- Bouton cash -->
+  <button type="submit" onclick="document.getElementById('paymentType').value='cash'">
     💵 Paiement cash à la livraison
   </button>
+
 </form>
+
+  
 
   <h3>Total à payer : <%= cartTotal %> MAD</h3>
 

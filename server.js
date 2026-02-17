@@ -250,9 +250,35 @@ app.use(express.json());
 const routes = require("./routes/index.js");
 app.use("/", routes);
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Serveur démarré sur http://localhost:${PORT}`));
 
 
 // IMPORTANT POUR VERCEL
+app.post("/orders/checkout", async (req, res) => {
+  try {
+
+    console.log("BODY:", req.body); // IMPORTANT POUR TEST
+
+    const nouvelleCommande = new Commande({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      address: req.body.address,
+      email: req.body.email,
+      phone: req.body.phone,
+      postalCode: req.body.postalCode,
+      paymentType: req.body.paymentType,
+      cartItems: req.body.cartItems
+    });
+
+    await nouvelleCommande.save();
+
+    res.redirect("/confirm");
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur commande");
+  }
+});
+ 
+
+
 module.exports = app;
