@@ -44,8 +44,8 @@ mongoose.connect(process.env.MONGODB_URL)
   .then(() => console.log('MongoDB connection established successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Routes
-app.use('/orders', ordersRouter);
+// Routes 
+
 
 // Serveur
 
@@ -255,8 +255,6 @@ app.use("/", routes);
 
 
 // IMPORTANT POUR VERCEL
-
-
 
 
 module.exports = app;

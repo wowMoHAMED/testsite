@@ -3,6 +3,8 @@ const router = express.Router();
 const Order = require('../models/Order');
 const Meal = require('../models/Meal');
 const PDFDocument = require('pdfkit');
+const cloudinary = require("../config/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 
 // Admin: list orders
@@ -89,6 +91,26 @@ const orderSchema = new mongoose.Schema({
 });
 
 
+const path = require('path');
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+
+    let resourceType = "image";
+
+    // si le fichier est une vidéo
+    if (file.mimetype.startsWith("video")) {
+      resourceType = "video";
+    }
+
+    return {
+      folder: "restaurant",
+      resource_type: resourceType
+    };
+  }
+});
+
 
 // Checkout page
 router.get('/checkout', (req, res) => {
@@ -98,7 +120,7 @@ router.get('/checkout', (req, res) => {
 });
 
 // Valider la commande
-router.post('/checkout', async (req, res) => {
+router.post('/add', async (req, res) => {
   try {
     const { firstName, lastName, address, email, phone, postalCode, paymentType } = req.body;
     const cart = req.session.cart || [];
@@ -139,24 +161,8 @@ router.get('/commandes', async (req, res) => {
 
 const multer = require("multer");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/uploads");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
-
-
 module.exports = multer({ storage });
 // Exemple d’ajout au panier pour test
-
-
-
-
-
-
 
 module.exports = router;
  
