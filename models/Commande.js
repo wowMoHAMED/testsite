@@ -1,16 +1,39 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const CommandeSchema = new mongoose.Schema({
-  firstName: String,
-  lastName: String,
-  address: String,
-  email: String,
-  phone: String,
-  paymentType: String,
-  orderNumber: String,
-  cart: Array,
-  total: Number,
-  createdAt: { type: Date, default: Date.now }
-});
+const commandeSchema = new mongoose.Schema({
 
-export default mongoose.model("Commande", CommandeSchema);
+  nom: {
+    type: String,
+    required: true
+  },
+
+  telephone: {
+    type: String,
+    required: true
+  },
+
+  adresse: {
+    type: String,
+    required: true
+  },
+
+  produits: {
+    type: String,
+    required: true
+  },
+
+  total: {
+    type: Number,
+    required: true
+  },
+
+  date: {
+    type: Date,
+    default: Date.now
+  }
+
+}, { collection: "commandes" });
+
+module.exports =
+  mongoose.models.Commande ||
+  mongoose.model("Commande", commandeSchema);

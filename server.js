@@ -40,6 +40,7 @@ app.use(session({
 }));
 
 // Connexion MongoDB (Mongoose 7+)
+
 mongoose.connect(process.env.MONGODB_URL)
   .then(() => console.log('MongoDB connection established successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
@@ -252,9 +253,21 @@ app.use(express.json());
 const routes = require("./routes/index.js");
 app.use("/", routes);
 
+app.get("/commande-reussie", (req, res) => {
+  res.render("commande-reussie", {
+    message: "Merci ! Votre commande a été enregistrée.",
+  });
+});
 
 
-// IMPORTANT POUR VERCEL
+const enregistrerCommande = require("./controllers/commandeController");
+
+app.post("/api/commande", enregistrerCommande);
+
+//IMPORTANT POUR VERCEL
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Serveur démarré sur http://localhost:${PORT}`));
+
 
 
 module.exports = app;

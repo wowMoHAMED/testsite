@@ -120,7 +120,7 @@ router.get('/checkout', (req, res) => {
 });
 
 // Valider la commande
-router.post('/add', async (req, res) => {
+router.post('/commande', async (req, res) => {
   try {
     const { firstName, lastName, address, email, phone, postalCode, paymentType } = req.body;
     const cart = req.session.cart || [];

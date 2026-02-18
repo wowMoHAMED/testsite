@@ -22,37 +22,35 @@
       <h2>Finaliser votre commande</h2>
 
       <!-- Formulaire unique -->
-      <form action="/orders/add" method="POST">
-        <!-- Affichage du panier -->
-        <% cart.forEach((item, idx) => { %>
-          <div class="imgvali">
-            <img src="<%= item.image %>" alt="<%= item.mealName %>" class="cart-img">
-            <h3>Nom: <%= item.mealName %></h3>
-            <h3>Quantité: <%= item.quantity %></h3>
-            <h3>Prix: <%= item.lineTotal %> MAD</h3>
-          </div>
-        <% }) %>
+      <form action="/api/commande" method="POST">
+  <!-- Panier -->
+  <% cart.forEach((item, idx) => { %>
+    <div class="imgvali">
+      <img src="<%= item.image %>" alt="<%= item.mealName %>" class="cart-img">
+      <h3>Nom: <%= item.mealName %></h3>
+      <h3>Quantité: <%= item.quantity %></h3>
+      <h3>Prix: <%= item.lineTotal %> MAD</h3>
+    </div>
+  <% }) %>
 
-        <!-- Infos client -->
-        <div class="vali">
-          <input type="text" name="firstName" placeholder="Prénom" required>
-          <input type="text" name="lastName" placeholder="Nom" required>
-          <input type="text" name="address" placeholder="Adresse" required>
-          <input type="email" name="email" placeholder="Email" required>
-          <input type="tel" name="phone" placeholder="Téléphone" required>
-          <input type="text" name="postalCode" placeholder="Code postal" required>
-        </div>
+  <!-- Infos client (champs alignés au modèle) -->
+  <div class="vali">
+    <input type="text" name="nom" placeholder="Nom complet" required>
+    <input type="tel" name="telephone" placeholder="Téléphone" required>
+    <input type="text" name="adresse" placeholder="Adresse" required>
+  </div>
 
-        <!-- Paiement cash -->
-        <input type="hidden" name="paymentType" value="cash">
+  <!-- Paiement cash -->
+  <input type="hidden" name="paymentType" value="cash">
 
-        <!-- Panier JSON envoyé en champ caché -->
-        <input type="hidden" name="cartItemsData" id="cartItemsData">
+  <!-- Panier JSON envoyé en champ caché -->
+  <input type="hidden" name="produits" id="cartItemsData" value='<%- JSON.stringify(cart) %>'>
 
-        <button type="submit">💵 Paiement cash à la livraison</button>
-      </form>
+  <!-- Total -->
+  <input type="hidden" name="total" value="<%= cartTotal %>">
 
-      <h3>Total à payer : <%= cartTotal %> MAD</h3>
+  <button type="submit">💵 Paiement cash à la livraison</button>
+</form>
     </div>
   </section>
 
