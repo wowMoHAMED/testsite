@@ -1,5 +1,6 @@
-const dbConnect = require("../lib/mongodb");
+/*const dbConnect = require("../lib/mongodb");
 const Commande = require("../models/Commande");
+
 
 async function enregistrerCommande(req, res) {
 
@@ -17,4 +18,4 @@ async function enregistrerCommande(req, res) {
   }
 }
 
-module.exports = enregistrerCommande;
+module.exports = enregistrerCommande;*/

@@ -9,8 +9,7 @@ const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
 // <-- obligatoire pour charger .env
 
-
-const ordersRouter = require('./routes/orders'); // Vérifie le chemin exact
+ // Vérifie le chemin exact
 
  
 // View engine & static
@@ -41,10 +40,11 @@ app.use(session({
 
 // Connexion MongoDB (Mongoose 7+)
 
-mongoose.connect(process.env.MONGODB_URL)
-  .then(() => console.log('MongoDB connection established successfully'))
-  .catch(err => console.error('MongoDB connection error:', err));
 
+// connexion MongoDB
+mongoose.connect(process.env.MONGODB_URL)
+.then(()=> console.log("MongoDB connecté"));
+ 
 // Routes 
 
 
@@ -55,7 +55,8 @@ const mealRoutes = require('./routes/meals');
 const orderRoutes = require('./routes/orders');
 app.use('/meals', mealRoutes);
 app.use('/orders', orderRoutes);
-
+const commroutes= require('./api/comm');
+app.use('/comm',commroutes);
 
 // Main page
 const Meal = require('./models/Meal');
@@ -71,7 +72,7 @@ app.get('/', async (req, res) => {
   const cart = req.session.cart || [];
   const cartTotal = cart.reduce((sum, item) => sum + (item.lineTotal || 0), 0);
 
-  res.render('index', {
+  res.render('index', { 
     meals,
     brand: {
       name: "Restaurant",
@@ -99,7 +100,7 @@ app.get('/', async (req, res) => {
   const cartTotal = cart.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   res.render('index', { meals, cart, cartTotal, query: '', category: '' });
 });
-
+ 
 
 app.post('/payment/stripe', async (req, res) => {
   try {
@@ -138,6 +139,13 @@ app.get('/orders/confirm', (req, res) => {
     order: req.session.order
   });
 });
+app.get('/comm/confirm', (req, res) => {
+  res.render('confirm', {
+    order: req.session.order
+  });
+});
+
+
 app.post('/pay-online', async (req, res) => {
   try {
     const cartTotal = Number(req.body.cartTotal);
@@ -250,23 +258,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // routes
-const routes = require("./routes/index.js");
-app.use("/", routes);
+// //IMPORTANT POUR VERCEL
 
-app.get("/commande-reussie", (req, res) => {
-  res.render("commande-reussie", {
-    message: "Merci ! Votre commande a été enregistrée.",
-  });
-});
-
-
-const enregistrerCommande = require("./controllers/commandeController");
-
-app.post("/api/commande", enregistrerCommande);
-
-//IMPORTANT POUR VERCEL
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Serveur démarré sur http://localhost:${PORT}`));
 
 
 

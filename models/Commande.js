@@ -1,39 +1,27 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const commandeSchema = new mongoose.Schema({
+const OrderSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  address: String,
+  email: String,
+  phone: String,
+  postalCode: String,
+  cart: [
+    {
+      mealId: String,
+      mealName: String,
+      quantity: Number,
+      unitPrice: Number,
+      lineTotal: Number,
+      image: String,
+      video: String
+    }
+  ],
+  total: Number,
+  orderNumber: Number,
+  paymentType:String,
+  createdAt: { type: Date, default: Date.now }
+});  
 
-  nom: {
-    type: String,
-    required: true
-  },
-
-  telephone: {
-    type: String,
-    required: true
-  },
-
-  adresse: {
-    type: String,
-    required: true
-  },
-
-  produits: {
-    type: String,
-    required: true
-  },
-
-  total: {
-    type: Number,
-    required: true
-  },
-
-  date: {
-    type: Date,
-    default: Date.now
-  }
-
-}, { collection: "commandes" });
-
-module.exports =
-  mongoose.models.Commande ||
-  mongoose.model("Commande", commandeSchema);
+module.exports = mongoose.model('Commande', OrderSchema);
