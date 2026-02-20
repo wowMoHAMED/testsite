@@ -38,6 +38,20 @@ app.use(session({
   saveUninitialized: true
 }));
 
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+
+app.use(session({
+  secret: "adminchiguer",
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI
+  }),
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24
+  }
+}));
 // Connexion MongoDB (Mongoose 7+)
 
 
