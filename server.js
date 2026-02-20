@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
+app.set("trust proxy", 1);
 const app = express();
 const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
@@ -31,12 +32,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Sessions (simple demo)
-app.use(session({
-  secret: 'restaurant-secret',
-  resave: false, 
-  saveUninitialized: true
-}));
 
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
