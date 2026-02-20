@@ -309,9 +309,7 @@ app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
 
- app.listen(3000, () => {
-  console.log('Serveur démarré sur http://localhost:3000');
-});
+
  
  
 module.exports = app;
