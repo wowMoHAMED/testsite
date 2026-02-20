@@ -42,7 +42,7 @@ app.use(session({
 
 
 // connexion MongoDB
-mongoose.connect(process.env.MONGODB_URL)
+mongoose.connect("mongodb+srv://chiguermohamed41_db_user:OOMQ6cPkqQL4hsmB@cluster23.nlm4h2d.mongodb.net/?appName=Cluster23")
 .then(()=> console.log("MongoDB connecté"));
  
 // Routes 

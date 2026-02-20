@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Commande = require("../models/Commande");
 
 // MongoDB Atlas URI
-const MONGODB_URI = process.env.MONGODB_URL;
+
 
 // Cache connexion pour Vercel
 let cached = global.mongoose;
@@ -11,7 +11,7 @@ if (!cached) cached = global.mongoose = { conn: null, promise: null };
 async function connectDB() {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
+    cached.promise = mongoose.connect(process.env.MONGODB_URL, {
       bufferCommands: false,
     }).then((mongoose) => mongoose);
   }
