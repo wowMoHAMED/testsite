@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
-app.set("trust proxy", 1);
+
 const app = express();
 const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
@@ -12,7 +12,11 @@ const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète
 
  // Vérifie le chemin exact
 
- 
+ app.use(session({
+  secret: "secretAdmin123",
+  resave: false,
+  saveUninitialized: false
+}));
 // View engine & static
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -32,21 +36,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-
-app.use(session({
-  secret: "adminchiguer",
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI
-  }),
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24
-  }
-}));
 // Connexion MongoDB (Mongoose 7+)
 
 
@@ -318,7 +307,9 @@ app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
 
-
+app.listen(3000, () => {
+  console.log("Server running on http://localhost:3000");
+});
 
  
 module.exports = app;
