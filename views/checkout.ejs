@@ -21,20 +21,28 @@
     <div class="checkout-container">
       <h2>Finaliser votre commande</h2>
 
-      <!-- Formulaire unique -->
-      <form action="/comm/checkout" method="POST">
-        <!-- Affichage du panier -->
-        <% cart.forEach((item, idx) => { %>
-          <div class="imgvali">
-            <img src="<%= item.image %>" alt="<%= item.mealName %>" class="cart-img">
-            <h3>Nom: <%= item.mealName %></h3>
-            <h3>Quantité: <%= item.quantity %></h3>
-            <h3>Prix: <%= item.lineTotal %> MAD</h3>
-          </div>
-      
+      <form action="/api/comm" method="POST">
+
+  <% cart.forEach((item, index) => { %>
+    <div class="imgvali">
+      <img src="<%= item.image %>" class="cart-img">
+      <h3>Nom: <%= item.mealName %></h3>
+      <h3>Quantité: <%= item.quantity %></h3>
+      <h3>Prix: <%= item.lineTotal %> MAD</h3>
+    </div>
+
+    <!-- input cachés -->
+    <input type="hidden" name="cart[<%= index %>][mealId]" value="<%= item._id || '' %>">
+    <input type="hidden" name="cart[<%= index %>][mealName]" value="<%= item.mealName %>">
+    <input type="hidden" name="cart[<%= index %>][quantity]" value="<%= item.quantity %>">
+    <input type="hidden" name="cart[<%= index %>][unitPrice]" value="<%= item.unitPrice || 0 %>">
+    <input type="hidden" name="cart[<%= index %>][lineTotal]" value="<%= item.lineTotal %>">
+    <input type="hidden" name="cart[<%= index %>][image]" value="<%= item.image %>">
+    <input type="hidden" name="cart[<%= index %>][video]" value="<%= item.video %>">
   <% }) %>
-        <!-- Infos client -->
-        <div class="vali">
+
+  <!-- infos client -->
+ <div class="vali">
           <input type="text" name="firstName" placeholder="Prénom" required>
           <input type="text" name="lastName" placeholder="Nom" required>
           <input type="text" name="address" placeholder="Adresse" required>
@@ -44,19 +52,14 @@
     
         </div>
 
-        <!-- Paiement cash -->
-        <input type="hidden" name="paymentType" value="cash">
 
-        <!-- Panier JSON envoyé en champ caché -->
-        <input type="hidden" name="cartItemsData" id="cartItemsData">
+  <!-- paiement cash -->
+  <input type="hidden" name="paymentType" value="cash">
 
-        <button type="submit">💵 Paiement cash à la livraison</button>
-      </form>
-
-      <h3>Total à payer : <%= cartTotal %> MAD</h3>
+  <!-- bouton -->
+  <button type="submit">💵 Paiement cash à la livraison</button>
+</form>
     </div>
-  </section>
-
 
   <!-- Dark mode -->
   <script>
@@ -107,7 +110,8 @@
       });
     });
   </script>
-  
+
+
 
 </body>
 </html>

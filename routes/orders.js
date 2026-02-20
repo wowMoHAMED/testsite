@@ -140,7 +140,7 @@ router.post('/checkout', async (req, res) => {
       cart,
       total: cartTotal,
       orderNumber: count + 1 , 
-      paymentType
+      paymentType  
        // ← numéro clair
     });
 
