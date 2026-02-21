@@ -22,6 +22,7 @@ const OrderSchema = new mongoose.Schema({
   orderNumber: Number,
   paymentType:String,
   createdAt: { type: Date, default: Date.now }
+  
 });  
 
 module.exports = mongoose.model('Commande', OrderSchema);

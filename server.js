@@ -5,13 +5,14 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
 
+
 const app = express();
 const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
 // <-- obligatoire pour charger .env
 
  // Vérifie le chemin exact
-
+ 
  app.use(session({
   secret: "secretAdmin123",
   resave: false,
@@ -42,7 +43,7 @@ app.use((req, res, next) => {
 // connexion MongoDB
 mongoose.connect("mongodb+srv://chiguermohamed41_db_user:OOMQ6cPkqQL4hsmB@cluster23.nlm4h2d.mongodb.net/?appName=Cluster23")
 .then(()=> console.log("MongoDB connecté"));
- 
+
 // Routes 
 
 
@@ -53,8 +54,7 @@ const mealRoutes = require('./routes/meals');
 const orderRoutes = require('./routes/orders');
 app.use('/meals', mealRoutes);
 app.use('/orders', orderRoutes);
-const commroutes= require('./api/comm');
-app.use('/comm',commroutes);
+
 
 // Main page
 const Meal = require('./models/Meal');
@@ -132,16 +132,29 @@ app.post('/payment/stripe', async (req, res) => {
 
 
   
-app.get('/orders/confirm', (req, res) => {
+/*app.get('/orders/confirm', (req, res) => {
   res.render('confirm', {
     order: req.session.order
   });
+});*/
+const Commande = require("./models/Commande");
+
+app.get("/commandes/:id", async (req, res) => {
+  try {
+    const order = await Commande.findById(req.params.id);
+
+    if (!order) {
+      return res.send("Commande introuvable");
+    }
+
+    res.render("info", { order });
+
+  } catch (err) { 
+    console.log(err); 
+    res.send("Erreur serveur");
+  }
 });
-app.get('/comm/confirm', (req, res) => {
-  res.render('confirm', {
-    order: req.session.order
-  });
-});
+
 
 
 app.post('/pay-online', async (req, res) => {
@@ -280,7 +293,7 @@ app.get("/confirm/:id", async (req, res) => {
       total: order.total,
       orderNumber: order._id
     });
-
+ 
   } catch (err) {
     console.log(err);
     res.redirect("/");
@@ -293,6 +306,7 @@ app.use(express.json());
 
 });
 
+  // body.cart devrait maintenant contenir tous les items
 
 const commRoutes = require("./api/comm");
 app.use("/api/comm", commRoutes);
@@ -308,5 +322,9 @@ app.get("/commande-reussie", (req, res) => {
 });
 
 
+
+
+
 module.exports = app;
 
+ 

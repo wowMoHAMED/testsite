@@ -20,8 +20,7 @@
   <section class="checkout">
     <div class="checkout-container">
       <h2>Finaliser votre commande</h2>
-
-      <form action="/api/comm" method="POST">
+<form action="/api/comm" method="POST" >
 
   <% cart.forEach((item, index) => { %>
     <div class="imgvali">
@@ -32,14 +31,19 @@
     </div>
 
     <!-- input cachés -->
-    <input type="hidden" name="cart[<%= index %>][mealId]" value="<%= item._id || '' %>">
-    <input type="hidden" name="cart[<%= index %>][mealName]" value="<%= item.mealName %>">
-    <input type="hidden" name="cart[<%= index %>][quantity]" value="<%= item.quantity %>">
-    <input type="hidden" name="cart[<%= index %>][unitPrice]" value="<%= item.unitPrice || 0 %>">
-    <input type="hidden" name="cart[<%= index %>][lineTotal]" value="<%= item.lineTotal %>">
-    <input type="hidden" name="cart[<%= index %>][image]" value="<%= item.image %>">
-    <input type="hidden" name="cart[<%= index %>][video]" value="<%= item.video %>">
+   <input type="hidden" name="cart[]" value='<%= JSON.stringify({
+  mealId: item._id || "",
+  mealName: item.mealName,
+  quantity: item.quantity,
+  unitPrice: item.unitPrice || 0,
+  lineTotal: item.lineTotal,
+  image: item.image,
+  video: item.video
+}) %>'>
+
+    
   <% }) %>
+ 
 
   <!-- infos client -->
  <div class="vali">

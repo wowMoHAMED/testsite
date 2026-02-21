@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Commande = require("../models/Commande");
-
+const express = require('express');
+const router = express.Router();
 // MongoDB Atlas URI
 
 
@@ -45,46 +46,47 @@ module.exports = async (req, res) => {
       phone,
       postalCode,
       paymentType,
-      total,
+    
       orderNumber,
     } = body;
-
+ 
     // Recupération panier
     // cart[0][mealName], cart[0][quantity], etc.
-    let cart = [];
-    if (body.cart) {
-      // body.cart peut être un objet si plusieurs produits
-      if (Array.isArray(body.cart)) {
-        cart = body.cart;
-      } else {
-        // conversion en tableau si un seul élément
-        cart = Object.values(body.cart).map((item) => ({
-          mealId: item.mealId || "",
-          mealName: item.mealName || "",
-          quantity: Number(item.quantity || 1),
-          unitPrice: Number(item.unitPrice || 0),
-          lineTotal: Number(item.lineTotal || 0),
-          image: item.image || "",
-          video: item.video || "",
-        }));
-      }
-    }
+ let cart = [];
+if (body.cart) {
+  cart = Array.isArray(body.cart) ? body.cart : Object.values(body.cart);
+  cart = cart.map(itemStr => {
+    const item = typeof itemStr === "string" ? JSON.parse(itemStr) : itemStr;
+    return {
+      mealId: item.mealId || "",
+      mealName: item.mealName || "",
+      quantity: Number(item.quantity || 1),
+      unitPrice: Number(item.unitPrice || 0),
+      lineTotal: Number(item.lineTotal || 0),
+      image: item.image || "",
+      video: item.video || ""
+    };
+  });
+}
 
-    // Création nouvelle commande
-    const nouvelleCommande = new Commande({
-      firstName,
-      lastName,
-      address,
-      email,
-      phone,
-      postalCode,
-      paymentType: Array.isArray(paymentType) ? paymentType[0] : paymentType,
-      cart,
-      total: Number(total || 0),
-      orderNumber: Number(orderNumber || Date.now()),
-    });
+// Calcul du total
+const total = cart.reduce((sum, item) => sum + item.lineTotal, 0);
+
+const nouvelleCommande = new Commande({
+  firstName,
+  lastName,
+  address,
+  email,
+  phone,
+  postalCode,
+  paymentType: Array.isArray(paymentType) ? paymentType[0] : paymentType,
+  cart,
+  total,
+  orderNumber: Number(orderNumber || Date.now())
+});
 
     await nouvelleCommande.save();
+
 
     // Redirection vers page succès
     res.writeHead(302, { Location: "/commande-reussie" });
@@ -93,6 +95,9 @@ module.exports = async (req, res) => {
 
   } catch (err) {
     console.error("ERREUR API COMM:", err);
-    res.status(500).send("Erreur serveur");
+    return res.status(500).send("Erreur serveur");
+
   }
+// Page commandes admin
+
 };

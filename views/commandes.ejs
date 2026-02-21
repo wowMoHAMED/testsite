@@ -22,12 +22,12 @@
   </header> 
   <div class="commd">
   <!-- Bouton PDF en haut -->
-  <form action="/orders/commandes/pdf" method="GET" class="top-pdf">
+  <form action="/api/comm/commandes/pdf" method="GET" class="top-pdf">
     <button type="submit">Télécharger en PDF</button>
   </form>
 
 <h2>Liste des commandes 🧾</h2>
-
+<
 <% orders.forEach(order => { %>
   <div class="order-block">
     <p><strong>Client :</strong> <%= order.firstName %> <%= order.lastName %></p>
