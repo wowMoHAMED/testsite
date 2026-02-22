@@ -20,7 +20,7 @@
     <!-- Barre de recherche -->
   <section class="search">
     <form method="GET" action="/">
-      <input type="text" name="q" placeholder="Rechercher un plat..." value="<%= query %>">
+      <input type="text" name="q" placeholder="Rechercher un produit..." value="<%= query %>">
       <select name="cat">
         <option value="">Toutes catégories</option>
         <option value="android" <%= category==='android'?'selected':'' %>>android</option>
@@ -77,9 +77,16 @@
       <% } %>
 
       <!-- VIDÉO -->
-      <% if (meal.video) { %>
-        <video src="<%= meal.video %>" controls style="max-width:100%"></video>
-      <% } %>
+    <% if (meal.video) { %>
+  <video src="<%= meal.video %>" 
+         autoplay 
+         playsinline 
+         loop 
+         controls="false" 
+         style="max-width:100%">
+  </video>
+<% } %>
+
 
       <h2><%= meal.name %></h2>
       <p class="category">Catégorie : <%= meal.category %></p>
@@ -87,11 +94,11 @@
       <p class="price"><%= meal.price %> MAD</p>
 
       <!-- Ajouter au panier -->
-      <form action="/orders/cart/add" method="POST">
-        <input type="hidden" name="mealId" value="<%= meal._id %>">
-        <input type="number" name="quantity" value="1" min="1">
-        <button type="submit">🛒 Ajouter au panier</button>
-      </form>
+      <form action="/orders/cart/add#cart" method="POST">
+  <input type="hidden" name="mealId" value="<%= meal._id %>">
+  <input type="number" name="quantity" value="1" min="1">
+  <button type="submit">🛒 Ajouter au panier</button>
+</form>
 
     </div>
   <% }) %>
@@ -99,7 +106,7 @@
 </section>
 
   <!-- Panier -->
-  <section class="cart" >
+  <section class="cart"  id="cart">
     <h3>🛒 Mon panier</h3>
     <% if (cart.length > 0) { %>
       <ul>
@@ -134,13 +141,26 @@
 
   <!-- Footer -->
   <footer>
-    <p>contact us: 0657274965</p>
-    <p>&copy; 2026 Chiguer's Phone — Fès, Maroc</p>
-<a href="https://mail.google.com/mail/?view=cm&to=chiguermohamed18@gmail.com&su=Bonjour&body=Votre message ici" target="_blank">
-  Envoyer un message via Gmail
-</a>
+  <div class="footer-container">
+    <div class="footer-item">
+      <img src="uploads\téléchargement__2_-removebg-preview.png" alt="Phone" class="footer-icon">
+      <span>0657274965</span>
+    </div>
+    <div class="footer-item">
+      <img src="uploads\64774-computer-gmail-email-icons-png-image-high-quality-removebg-preview.png" alt="Gmail" class="footer-icon">
+      <a href="https://mail.google.com/mail/?view=cm&to=chiguermohamed18@gmail.com&su=Bonjour&body=Votre message ici" target="_blank">
+        Envoyer un message
+      </a>
+    </div>
+    <div class="footer-item">
+      <span>&copy; 2026 Chiguer's Phone — Fès, Maroc</span>
+    </div>
+    <div class="footer-item">
+      <span>Développé par: Mohamed Chiguer</span>
+    </div>
+  </div>
+</footer>
 
-  </footer>
    <!--mode nuit -->
    
 <script>
@@ -237,7 +257,29 @@ navItems.forEach(item => {
     document.body.classList.remove("no-scroll");
   }
 </script>
+<script>
+  // Vérifie si l’URL contient #cart
+  if (window.location.hash === "#cart") {
+    const cartSection = document.getElementById("cart");
+    if (cartSection) {
+      cartSection.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+</script>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const videos = document.querySelectorAll("video");
+
+    // Dès que l’utilisateur clique quelque part, activer le son
+    document.body.addEventListener("click", () => {
+      videos.forEach(video => {
+        video.muted = false;   // enlever le mute
+        video.play();          // relancer la lecture avec son
+      });
+    }, { once: true }); // ne s’exécute qu’une fois
+  });
+</script>
 
 
 </body>

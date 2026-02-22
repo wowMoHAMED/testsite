@@ -321,7 +321,59 @@ app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
 
+app.get("/comm/cominfo", async (req, res) => {
+  try {
+    const orders = await Commande.find().sort({ createdAt: -1 });
+    res.render("cominfo", { orders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur lors du chargement des infos");
+  }
+});
 
+/* pdf*/
+const PDFDocument = require("pdfkit");
+ 
+
+app.get("/comm/cominfo/pdf", async (req, res) => {
+  try {
+    const orders = await Commande.find().sort({ createdAt: -1 });
+
+    const doc = new PDFDocument();
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=cominfo.pdf");
+
+    doc.pipe(res);
+
+    doc.fontSize(18).text("Infos des commandes", { align: "center" });
+    doc.moveDown();
+
+    orders.forEach(order => {
+      doc.fontSize(14).text(`Client: ${order.firstName} ${order.lastName}`);
+      doc.text(`Adresse: ${order.address}`);
+      doc.text(`Email: ${order.email}`);
+      doc.text(`Téléphone: ${order.phone}`);
+      doc.text(`Numéro de commande: ${order.orderNumber}`);
+      doc.text(`Date: ${new Date(order.createdAt).toLocaleString()}`);
+      doc.text(`Paiement: ${order.paymentType}`);
+      doc.moveDown();
+
+      doc.text("Produits:");
+      order.cart.forEach(item => {
+        doc.text(`- ${item.mealName} | Qté: ${item.quantity} | Prix: ${item.lineTotal} MAD`);
+      });
+
+      doc.moveDown();
+      doc.text(`Total: ${order.total} MAD`, { underline: true });
+      doc.moveDown().moveDown();
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur lors de la génération du PDF");
+  }
+});
 
 
 
