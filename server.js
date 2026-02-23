@@ -345,7 +345,9 @@ app.get("/checkout", (req, res) => {
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
-
-module.exports = app;
+app.listen(3000, () => {
+  console.log("Serveur démarré sur http://localhost:3000");
+});
+module.exports = app; 
 
  
