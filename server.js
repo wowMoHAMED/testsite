@@ -306,20 +306,6 @@ app.use(express.json());
 
 });
 
-  // body.cart devrait maintenant contenir tous les items
-
-const commRoutes = require("./api/comm");
-app.use("/api/comm", commRoutes);
-app.get("/checkout", (req, res) => {
-  res.render("checkout", {
-    cart: [],
-    cartTotal: 0
-  });
-});
-
-app.get("/commande-reussie", (req, res) => {
-  res.render("commande-reussie");
-});
 
 app.get("/comm/cominfo", async (req, res) => {
   try {
@@ -375,6 +361,21 @@ app.get("/comm/cominfo/pdf", async (req, res) => {
   }
 });
 
+
+  // body.cart devrait maintenant contenir tous les items
+
+const commRoutes = require("./api/comm");
+app.use("/api/comm", commRoutes);
+app.get("/checkout", (req, res) => {
+  res.render("checkout", {
+    cart: [],
+    cartTotal: 0
+  }); 
+});
+
+app.get("/commande-reussie", (req, res) => {
+  res.render("commande-reussie");
+});
 
 
 module.exports = app;
