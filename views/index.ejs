@@ -58,7 +58,14 @@
   <!-- Hero section -->
   <section class="hero">
     <h2>Bienvenue chez <span>Chiguer's Phone</span></h2>
-    <p>Découvrez nos produits de bonne qualité et de prix abordable.</p>
+    <div class="marquee">
+  <p>📢 Développez votre activité en ligne !
+Nous créons des sites web professionnels (vitrine, e-commerce, sur mesure).
+Appelez-nous au 📞 [0657274965] et lancez votre projet dès aujourd’hui.
+
+</p>
+</div>
+
   </section>
 
   
@@ -94,7 +101,7 @@
       <p class="price"><%= meal.price %> MAD</p>
 
       <!-- Ajouter au panier -->
-      <form action="/orders/cart/add" method="POST">
+      <form action="/orders/cart/add#cart" method="POST">
   <input type="hidden" name="mealId" value="<%= meal._id %>">
   <input type="number" name="quantity" value="1" min="1">
   <button type="submit">🛒 Ajouter au panier</button>
@@ -257,7 +264,15 @@ navItems.forEach(item => {
     document.body.classList.remove("no-scroll");
   }
 </script>
-
+<script>
+  // Vérifie si l’URL contient #cart
+  if (window.location.hash === "#cart") {
+    const cartSection = document.getElementById("cart");
+    if (cartSection) {
+      cartSection.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+</script>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {

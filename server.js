@@ -273,23 +273,25 @@ app.use(express.json());
 
 
 
+
 app.get("/comm/cominfo", async (req, res) => {
   try {
-    const orders = await Commande.find().sort({ createdAt: -1 });
-    res.render("cominfo", { orders });
+    const commandes = await Commande.find().sort({ createdAt: -1 });
+    res.render("cominfo", { commandes });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Erreur lors du chargement des infos");
+    res.status(500).send("Erreur lors du chargement des commandes");
   }
 });
 
+
 /* pdf*/
 const PDFDocument = require("pdfkit");
- 
+
 
 app.get("/comm/cominfo/pdf", async (req, res) => {
   try {
-    const orders = await Commande.find().sort({ createdAt: -1 });
+    const commandes = await Commande.find().sort({ createdAt: -1 });
 
     const doc = new PDFDocument();
     res.setHeader("Content-Type", "application/pdf");
@@ -300,23 +302,24 @@ app.get("/comm/cominfo/pdf", async (req, res) => {
     doc.fontSize(18).text("Infos des commandes", { align: "center" });
     doc.moveDown();
 
-    orders.forEach(order => {
-      doc.fontSize(14).text(`Client: ${order.firstName} ${order.lastName}`);
-      doc.text(`Adresse: ${order.address}`);
-      doc.text(`Email: ${order.email}`);
-      doc.text(`Téléphone: ${order.phone}`);
-      doc.text(`Numéro de commande: ${order.orderNumber}`);
-      doc.text(`Date: ${new Date(order.createdAt).toLocaleString()}`);
-      doc.text(`Paiement: ${order.paymentType}`);
+    commandes.forEach(cmd => {
+      doc.fontSize(14).text(`Client: ${cmd.firstName} ${cmd.lastName}`);
+      doc.text(`Adresse: ${cmd.address}`);
+      doc.text(`Email: ${cmd.email}`);
+      doc.text(`Téléphone: ${cmd.phone}`);
+      doc.text(`Code postal: ${cmd.postalCode}`);
+      doc.text(`Numéro de commande: ${cmd.orderNumber}`);
+      doc.text(`Date: ${new Date(cmd.createdAt).toLocaleString()}`);
+      doc.text(`Paiement: ${cmd.paymentType}`);
       doc.moveDown();
 
       doc.text("Produits:");
-      order.cart.forEach(item => {
+      cmd.cart.forEach(item => {
         doc.text(`- ${item.mealName} | Qté: ${item.quantity} | Prix: ${item.lineTotal} MAD`);
       });
 
       doc.moveDown();
-      doc.text(`Total: ${order.total} MAD`, { underline: true });
+      doc.text(`Total: ${cmd.total} MAD`, { underline: true });
       doc.moveDown().moveDown();
     });
 
@@ -342,9 +345,7 @@ app.get("/checkout", (req, res) => {
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
-app.listen(3000, () => {
-  console.log("Serveur démarré sur http://localhost:3000");
-});
+
 module.exports = app;
 
  

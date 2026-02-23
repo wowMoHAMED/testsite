@@ -1421,76 +1421,6 @@ button:hover {
 
 /* Barre de navigation */
 
-
-/* Section commandes */
-.order-info {
-  max-width: 900px;
-  margin: 30px auto;
-  padding: 20px;
-}
-
-/* Bloc commande */
-.order-block {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 25px;
-  padding: 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.order-block h3, .order-block h4 {
-  margin: 8px 0;
-  color: #2c3e50;
-}
-
-.order-block p {
-  margin: 5px 0;
-}
-
-/* Liste des produits */
-.order-block ul {
-  list-style: none;
-  padding: 0;
-}
-
-.order-block ul li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  border-bottom: 1px dashed #ccc;
-  padding-bottom: 8px;
-}
-
-.order-block ul li img {
-  width: 70px;
-  height: auto;
-  margin-right: 15px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-}
-
-/* Total */
-.order-block h3 {
-  font-size: 18px;
-  font-weight: bold;
-  color: #27ae60;
-}
-
-/* Bouton retour ou actions */
-a.btn-back {
-  display: inline-block;
-  margin-top: 15px;
-  padding: 10px 15px;
-  background-color: #3498db;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-}
-
-a.btn-back:hover {
-  background-color: #2980b9;
-}
 footer {
   background-color: #2c3e50;
   color: #fff;
@@ -1535,4 +1465,26 @@ footer {
   .footer-item {
     margin: 8px 0;
   }
+}
+.marquee {
+  width: 100%;
+  overflow: hidden;
+     /* couleur de fond */
+  color: #f1f50b;                 /* couleur du texte */
+
+  position: relative;
+}
+
+.marquee p {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;          /* commence hors écran */
+  animation: scroll-text 15s linear infinite;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+@keyframes scroll-text {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }

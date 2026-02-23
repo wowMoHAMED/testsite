@@ -3,52 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Détails des commandes</title>
+
+  <title>Mohamed's Restaurant</title>
   <link rel="stylesheet" href="/style.css">
-  <link rel="icon" type="image" sizes="32x32" href="uploads\istockphoto-1057455004-612x612-removebg-preview.png">
+<link rel="icon" type="image" sizes="32x32" href="uploads\istockphoto-1057455004-612x612-removebg-preview.png">
 </head>
 <body>
-  <header class="navbar">
-    <div class="logo"> Admin -Chiguer's Phone</div>
-    <nav class="nav-links" id="navLinks">
-      <a href="/meals/admin">Admin</a>
-    
-      <a href="/comm/cominfo">Infos</a>
-      <button id="darkModeToggle">🌙 Mode Nuit</button>
+     <header class="navbar">
+    <div class="logo">Chiguer's phone</div>
+  
+  <nav class="nav-links" id="navLinks">
+   <a href="/meals/admin">Admin</a>
+    <button id="darkModeToggle">🌙 Mode Nuit</button>
     </nav>
-    <div class="menu-toggle" id="menuToggle">☰</div>
-  </header>
-
-  <section class="order-info">
-    <h2>Infos des commandes validées ✅</h2>
+    <div class="menu-toggle" id="menuToggle">
+    ☰
+  </div>
+  </header> 
+  <div class="commd">
+  <!-- Bouton PDF en haut -->
   <form action="/comm/cominfo/pdf" method="GET" class="top-pdf">
   <button type="submit">📄 Télécharger en PDF</button>
 </form>
-    <% orders.forEach(order => { %>
-      <div class="order-block">
-        <h3>Client :</h3>
-        <p><strong>Nom :</strong> <%= order.firstName %> <%= order.lastName %></p>
-        <p><strong>Adresse :</strong> <%= order.address %></p>
-        <p><strong>Email :</strong> <%= order.email %></p>
-        <p><strong>Téléphone :</strong> <%= order.phone %></p>
-        <p><strong>Code postal :</strong> <%= order.postalCode %></p>
-        <p><strong>Date :</strong> <%= new Date(order.createdAt).toLocaleString() %></p>
-        <p><strong>Numéro de commande :</strong> <%= order.orderNumber %></p>
 
-        <h4>Produits :</h4>
-        <ul>
-          <% order.cart.forEach(item => { %>
-            <li>
-              <img src="<%= item.image %>" alt="<%= item.mealName %>" width="80">
-              <p><%= item.mealName %> — Quantité: <%= item.quantity %> — Prix: <%= item.lineTotal %> MAD</p>
-            </li>
-          <% }) %>
-        </ul>
 
-        <h3>Total : <%= order.total %> MAD</h3>
-        <hr>
-      </div>
-    <% }) %>
-  </section>
+
+<section class="order-info">
+  <h2>Liste des commandes ✅</h2>
+
+  <% commandes.forEach(cmd => { %>
+    <div class="order-block">
+      <p><strong>Nom :</strong> <%= cmd.firstName %> <%= cmd.lastName %></p>
+      <p><strong>Adresse :</strong> <%= cmd.address %></p>
+      <p><strong>Email :</strong> <%= cmd.email %></p>
+      <p><strong>Téléphone :</strong> <%= cmd.phone %></p>
+      <p><strong>Code postal :</strong> <%= cmd.postalCode %></p>
+      <p><strong>Numéro de commande :</strong> <%= cmd.orderNumber %></p>
+      <p><strong>Date :</strong> <%= new Date(cmd.createdAt).toLocaleString() %></p>
+
+      <h4>Produits :</h4>
+      <ul>
+        <% cmd.cart.forEach(item => { %>
+          <li>
+            <img src="<%= item.image %>" alt="<%= item.mealName %>" width="80">
+            <%= item.mealName %> — Qté: <%= item.quantity %> — Prix: <%= item.lineTotal %> MAD
+          </li>
+          
+      <h3>Total : <%= item.lineTotal %> MAD</h3>
+        <% }) %>
+      </ul>
+
+      <hr>
+    </div>
+  <% }) %>
+</section>
+
+
+
+<script>
+  const menuToggle = document.getElementById("menuToggle");
+  const navLinks = document.getElementById("navLinks");
+
+  menuToggle.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+  });
+</script>
+<script>
+  const toggle = document.getElementById('darkModeToggle');
+  toggle.addEventListener('click', () => {
+    document.body.classList.toggle('night');
+  });
+</script>
+
 </body>
 </html>
