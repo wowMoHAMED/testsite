@@ -270,98 +270,7 @@ app.use(express.json());
 
 // routes
 // //IMPORTANT POUR VERCEL
-const Order = require('./models/Order');
 
-app.get("/confirm/:id", async (req, res) => {
-
-try {
-
-const order = await Order.findById(req.params.id);
-
-if (!order) {
-return res.redirect("/");
-}
-
-res.render("confirm", {
-cart: order.cart,
-firstName: order.firstName,
-lastName: order.lastName,
-address: order.address,
-email: order.email,
-phone: order.phone,
-postalCode: order.postalCode,
-total: order.total,
-orderNumber: order._id
-});
-
-} catch (err) {
-console.log(err);
-res.redirect("/");
-}
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-
-
-});
-
-  // body.cart devrait maintenant contenir tous les items
-
-
-app.get("/comm/cominfo", async (req, res) => {
-try {
-const orders = await Commande.find().sort({ createdAt: -1 });
-res.render("cominfo", { orders });
-} catch (err) {
-console.error(err);
-res.status(500).send("Erreur lors du chargement des infos");
-}
-});
-
-/* pdf*/
-const PDFDocument = require("pdfkit");
-
-
-app.get("/comm/cominfo/pdf", async (req, res) => {
-try {
-const orders = await Commande.find().sort({ createdAt: -1 });
-
-const doc = new PDFDocument();
-res.setHeader("Content-Type", "application/pdf");
-res.setHeader("Content-Disposition", "attachment; filename=cominfo.pdf");
-
-doc.pipe(res);
-
-doc.fontSize(18).text("Infos des commandes", { align: "center" });
-doc.moveDown();
-
-orders.forEach(order => {
-doc.fontSize(14).text(`Client: ${order.firstName} ${order.lastName}`);
-doc.text(`Adresse: ${order.address}`);
-doc.text(`Email: ${order.email}`);
-doc.text(`Téléphone: ${order.phone}`);
-doc.text(`Numéro de commande: ${order.orderNumber}`);
-doc.text(`Date: ${new Date(order.createdAt).toLocaleString()}`);
-doc.text(`Paiement: ${order.paymentType}`);
-doc.moveDown();
-
-doc.text("Produits:");
-order.cart.forEach(item => {
-doc.text(`- ${item.mealName} | Qté: ${item.quantity} | Prix: ${item.lineTotal} MAD`);
-});
-
-doc.moveDown();
-doc.text(`Total: ${order.total} MAD`, { underline: true });
-doc.moveDown().moveDown();
-});
-
-doc.end();
-} catch (err) {
-console.error(err);
-res.status(500).send("Erreur lors de la génération du PDF");
-}
-});
 
 
   // body.cart devrait maintenant contenir tous les items
@@ -374,10 +283,53 @@ app.get("/checkout", (req, res) => {
     cartTotal: 0
   }); 
 });
+ // ton modèle
+
+// Page admin pour voir les commandes
+app.get("/comm/cominfo", async (req, res) => {
+  try {
+    const commandes = await Commande.find().sort({ createdAt: -1 });
+    res.render("cominfo", { commandes });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur lors du chargement des commandes");
+  }
+});
+
+
+app.get("/checkout", (req, res) => {
+  const cart = req.session.cart || [];
+  const cartTotal = cart.reduce((sum, item) => sum + item.lineTotal, 0);
+
+  res.render("checkout", {
+    cart,
+    cartTotal
+  });
+});
+app.post("/cart/add", async (req, res) => {
+  const { mealId, quantity } = req.body;
+  const meal = await Meal.findById(mealId);
+  if (!meal) return res.redirect("/");
+
+  const qty = Number(quantity) || 1;
+  const lineTotal = qty * meal.price;
+
+  if (!req.session.cart) req.session.cart = [];
+  req.session.cart.push({
+    mealId: meal._id,
+    mealName: meal.name,
+    image: meal.image,
+    quantity: qty,
+    unitPrice: meal.price,
+    lineTotal
+  });
+
+  res.redirect("/checkout");
+});
 
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
 
-
 module.exports = app;
+ 
