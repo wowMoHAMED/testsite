@@ -5,14 +5,13 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
 
-
 const app = express();
 const Stripe = require('stripe');
 const stripe = Stripe('TA_CLE_SECRETE_STRIPE'); // remplace par ta clé secrète Stripe
 // <-- obligatoire pour charger .env
 
  // Vérifie le chemin exact
- 
+
  app.use(session({
   secret: "secretAdmin123",
   resave: false,
@@ -43,7 +42,7 @@ app.use((req, res, next) => {
 // connexion MongoDB
 mongoose.connect("mongodb+srv://chiguermohamed41_db_user:OOMQ6cPkqQL4hsmB@cluster23.nlm4h2d.mongodb.net/?appName=Cluster23")
 .then(()=> console.log("MongoDB connecté"));
-
+ 
 // Routes 
 
 
@@ -54,7 +53,8 @@ const mealRoutes = require('./routes/meals');
 const orderRoutes = require('./routes/orders');
 app.use('/meals', mealRoutes);
 app.use('/orders', orderRoutes);
-
+const commroutes= require('./api/comm');
+app.use('/comm',commroutes);
 
 // Main page
 const Meal = require('./models/Meal');
@@ -132,29 +132,16 @@ app.post('/payment/stripe', async (req, res) => {
 
 
   
-/*app.get('/orders/confirm', (req, res) => {
+app.get('/orders/confirm', (req, res) => {
   res.render('confirm', {
     order: req.session.order
   });
-});*/
-const Commande = require("./models/Commande");
-
-app.get("/commandes/:id", async (req, res) => {
-  try {
-    const order = await Commande.findById(req.params.id);
-
-    if (!order) {
-      return res.send("Commande introuvable");
-    }
-
-    res.render("info", { order });
-
-  } catch (err) { 
-    console.log(err); 
-    res.send("Erreur serveur");
-  }
 });
-
+app.get('/comm/confirm', (req, res) => {
+  res.render('confirm', {
+    order: req.session.order
+  });
+});
 
 
 app.post('/pay-online', async (req, res) => {
@@ -267,72 +254,45 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
- 
+
 // routes
 // //IMPORTANT POUR VERCEL
+const Order = require('./models/Order');
 
-/*
+app.get("/confirm/:id", async (req, res) => {
 
-
-app.get("/comm/cominfo", async (req, res) => {
   try {
-    const commandes = await Commande.find().sort({ createdAt: -1 });
-    res.render("cominfo", { commandes });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erreur lors du chargement des commandes");
-  }
-});
 
-*/
-/* pdf*/
-/*
-const PDFDocument = require("pdfkit");
+    const order = await Order.findById(req.params.id);
 
+    if (!order) {
+      return res.redirect("/");
+    }
 
-app.get("/comm/cominfo/pdf", async (req, res) => {
-  try {
-    const commandes = await Commande.find().sort({ createdAt: -1 });
-
-    const doc = new PDFDocument();
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "attachment; filename=cominfo.pdf");
-
-    doc.pipe(res);
-
-    doc.fontSize(18).text("Infos des commandes", { align: "center" });
-    doc.moveDown();
-
-    commandes.forEach(cmd => {
-      doc.fontSize(14).text(`Client: ${cmd.firstName} ${cmd.lastName}`);
-      doc.text(`Adresse: ${cmd.address}`);
-      doc.text(`Email: ${cmd.email}`);
-      doc.text(`Téléphone: ${cmd.phone}`);
-      doc.text(`Code postal: ${cmd.postalCode}`);
-      doc.text(`Numéro de commande: ${cmd.orderNumber}`);
-      doc.text(`Date: ${new Date(cmd.createdAt).toLocaleString()}`);
-      doc.text(`Paiement: ${cmd.paymentType}`);
-      doc.moveDown();
-
-      doc.text("Produits:");
-      cmd.cart.forEach(item => {
-        doc.text(`- ${item.mealName} | Qté: ${item.quantity} | Prix: ${item.lineTotal} MAD`);
-      });
-
-      doc.moveDown();
-      doc.text(`Total: ${cmd.total} MAD`, { underline: true });
-      doc.moveDown().moveDown();
+    res.render("confirm", {
+      cart: order.cart,
+      firstName: order.firstName,
+      lastName: order.lastName,
+      address: order.address,
+      email: order.email,
+      phone: order.phone,
+      postalCode: order.postalCode,
+      total: order.total,
+      orderNumber: order._id
     });
 
-    doc.end();
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Erreur lors de la génération du PDF");
+    console.log(err);
+    res.redirect("/");
   }
-});
-*/
 
-  // body.cart devrait maintenant contenir tous les items
+  app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+
+
+});
+
 
 const commRoutes = require("./api/comm");
 app.use("/api/comm", commRoutes);
@@ -340,13 +300,15 @@ app.get("/checkout", (req, res) => {
   res.render("checkout", {
     cart: [],
     cartTotal: 0
-  }); 
+  });
 });
 
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
 
-module.exports = app; 
+app.listen(3000, () => {
+  console.log("Server running on http://localhost:3000");
+});
+module.exports = app;
 
- 
