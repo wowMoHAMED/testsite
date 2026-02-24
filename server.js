@@ -338,14 +338,14 @@ const commRoutes = require("./api/comm");
 app.use("/api/comm", commRoutes);
 app.get("/checkout", (req, res) => {
   res.render("checkout", {
-  
+    cart: [],
+    cartTotal: 0
   }); 
 });
 
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
-
 
 module.exports = app; 
 
