@@ -255,43 +255,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// routes
-// //IMPORTANT POUR VERCEL
-const Order = require('./models/Order');
 
-app.get("/confirm/:id", async (req, res) => {
-
-  try {
-
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return res.redirect("/");
-    }
-
-    res.render("confirm", {
-      cart: order.cart,
-      firstName: order.firstName,
-      lastName: order.lastName,
-      address: order.address,
-      email: order.email,
-      phone: order.phone,
-      postalCode: order.postalCode,
-      total: order.total,
-      orderNumber: order._id
-    });
-
-  } catch (err) {
-    console.log(err);
-    res.redirect("/");
-  }
-
-  app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-
-
-});
 
 
 const commRoutes = require("./api/comm");
@@ -306,9 +270,7 @@ app.get("/checkout", (req, res) => {
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
+ 
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
-});
 module.exports = app;
 
