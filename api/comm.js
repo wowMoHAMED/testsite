@@ -1,28 +1,26 @@
 const mongoose = require("mongoose");
 const Commande = require("../models/Commande");
+const express = require('express');
+const router = express.Router();
+// MongoDB Atlas URI
 
-module.exports.config = {
-  api: {
-    bodyParser: true,
-  },
-};
 
+// Cache connexion pour Vercel
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
 async function connectDB() {
   if (cached.conn) return cached.conn;
-
   if (!cached.promise) {
     cached.promise = mongoose.connect(process.env.MONGODB_URL, {
       bufferCommands: false,
-    });
+    }).then((mongoose) => mongoose);
   }
-
   cached.conn = await cached.promise;
   return cached.conn;
 }
 
+// Fonction exportée pour Vercel
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).send("Méthode non autorisée");
@@ -31,8 +29,15 @@ module.exports = async (req, res) => {
   try {
     await connectDB();
 
-    const body = req.body;
+    // req.body arrive en string si formulaire HTML classique
+    // on parse manuellement
+    let body = req.body;
+    if (typeof body === "string") {
+      const qs = require("qs");
+      body = qs.parse(body);
+    }
 
+    // Recupération des infos client
     const {
       firstName,
       lastName,
@@ -41,32 +46,30 @@ module.exports = async (req, res) => {
       phone,
       postalCode,
       paymentType,
+      total,
       orderNumber,
     } = body;
+ 
+    // Recupération panier
+    // cart[0][mealName], cart[0][quantity], etc.
+ let cart = [];
+if (body.cart) {
+  cart = body.cart.map(itemStr => {
+    const item = JSON.parse(itemStr);
+    return {
+      mealId: item.mealId,
+      mealName: item.mealName,
+      quantity: Number(item.quantity),
+      unitPrice: Number(item.unitPrice),
+      lineTotal: Number(item.lineTotal),
+      image: item.image,
+      video: item.video
+    };
+  });
+}
 
-    let cart = [];
 
-    if (body.cart) {
-      const cartItems = Array.isArray(body.cart)
-        ? body.cart
-        : [body.cart];
-
-      cart = cartItems.map(itemStr => {
-        const item = JSON.parse(itemStr);
-        return {
-          mealId: item.mealId,
-          mealName: item.mealName,
-          quantity: Number(item.quantity),
-          unitPrice: Number(item.unitPrice),
-          lineTotal: Number(item.lineTotal),
-          image: item.image,
-          video: item.video
-        };
-      });
-    }
-
-    const total = cart.reduce((sum, item) => sum + item.lineTotal, 0);
-
+    // Création nouvelle commande
     const nouvelleCommande = new Commande({
       firstName,
       lastName,
@@ -74,18 +77,37 @@ module.exports = async (req, res) => {
       email,
       phone,
       postalCode,
-      paymentType,
+      paymentType: Array.isArray(paymentType) ? paymentType[0] : paymentType,
       cart,
-      total,
-      orderNumber: Number(orderNumber || Date.now())
+      total: Number(total || 0),
+      orderNumber: Number(orderNumber || Date.now()),
     });
 
     await nouvelleCommande.save();
 
-    return res.redirect("/commande-reussie");
+    // Redirection vers page succès
+    res.writeHead(302, { Location: "/commande-reussie" });
+    res.end();
+ 
 
   } catch (err) {
     console.error("ERREUR API COMM:", err);
-    return res.status(500).send("Erreur serveur");
+    res.status(500).send("Erreur serveur");
+
   }
+// Page commandes admin
+router.get('/commandes', async (req, res) => {
+  try {
+    const orders = await Commande.find().sort({ createdAt: -1 });
+    res.render('commandes', { orders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
+
+
+
+
 };

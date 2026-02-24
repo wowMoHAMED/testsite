@@ -270,10 +270,96 @@ app.use(express.json());
 
 // routes
 
-
   // body.cart devrait maintenant contenir tous les items
 const commRoutes = require("./api/comm");
 app.use("/api/comm", commRoutes);
+app.get("/comm/cominfo", async (req, res) => {
+  try {
+    const commandes = await Commande.find().sort({ createdAt: -1 });
+
+    res.render("cominfo", { commandes });
+
+  } catch (err) {
+    console.error(err);
+    res.send("Erreur chargement commandes");
+  }
+});
+
+
+//pdf 
+
+const PDFDocument = require("pdfkit");
+
+
+app.get("/comm/cominfo/pdf", async (req, res) => {
+  try {
+
+    // récupérer toutes les commandes
+    const commandes = await Commande.find().sort({ createdAt: -1 });
+
+    // créer le PDF
+    const doc = new PDFDocument({ margin: 40, size: "A4" });
+
+    // headers pour téléchargement
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=commandes.pdf");
+
+    doc.pipe(res);
+
+    // Titre
+    doc
+      .fontSize(20)
+      .text("Liste des commandes - Chiguer's Phone", { align: "center" });
+
+    doc.moveDown(2);
+
+    // parcourir les commandes
+    commandes.forEach((cmd, index) => {
+
+      doc
+        .fontSize(12)
+        .text(`Commande #${cmd.orderNumber}`, { underline: true });
+
+      doc.text(`Nom : ${cmd.firstName} ${cmd.lastName}`);
+      doc.text(`Adresse : ${cmd.address}`);
+      doc.text(`Email : ${cmd.email}`);
+      doc.text(`Téléphone : ${cmd.phone}`);
+      doc.text(`Code postal : ${cmd.postalCode}`);
+      doc.text(`Date : ${new Date(cmd.createdAt).toLocaleString()}`);
+
+      doc.moveDown();
+
+      doc.text("Produits :", { bold: true });
+
+      let totalCommande = 0;
+
+      cmd.cart.forEach(item => {
+        doc.text(
+          `• ${item.mealName} | Qté: ${item.quantity} | Prix: ${item.lineTotal} MAD`
+        );
+        totalCommande += Number(item.lineTotal);
+      });
+
+      doc.moveDown();
+
+      doc
+        .fontSize(13)
+        .text(`TOTAL : ${totalCommande} MAD`, { align: "right" });
+
+      doc.moveDown(2);
+      doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+      doc.moveDown(2);
+
+    });
+
+    doc.end();
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur génération PDF");
+  }
+});
+
 
 app.get("/checkout", (req, res) => {
   const cart = req.session.cart || [];
