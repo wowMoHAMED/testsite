@@ -269,8 +269,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // routes
-// //IMPORTANT POUR VERCEL
-
 
 
   // body.cart devrait maintenant contenir tous les items
@@ -283,53 +281,13 @@ app.get("/checkout", (req, res) => {
     cartTotal: 0
   }); 
 });
- // ton modèle
-
-// Page admin pour voir les commandes
-app.get("/comm/cominfo", async (req, res) => {
-  try {
-    const commandes = await Commande.find().sort({ createdAt: -1 });
-    res.render("cominfo", { commandes });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erreur lors du chargement des commandes");
-  }
-});
-
-
-app.get("/checkout", (req, res) => {
-  const cart = req.session.cart || [];
-  const cartTotal = cart.reduce((sum, item) => sum + item.lineTotal, 0);
-
-  res.render("checkout", {
-    cart,
-    cartTotal
-  });
-});
-app.post("/cart/add", async (req, res) => {
-  const { mealId, quantity } = req.body;
-  const meal = await Meal.findById(mealId);
-  if (!meal) return res.redirect("/");
-
-  const qty = Number(quantity) || 1;
-  const lineTotal = qty * meal.price;
-
-  if (!req.session.cart) req.session.cart = [];
-  req.session.cart.push({
-    mealId: meal._id,
-    mealName: meal.name,
-    image: meal.image,
-    quantity: qty,
-    unitPrice: meal.price,
-    lineTotal
-  });
-
-  res.redirect("/checkout");
-});
 
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
 
+app.listen(3000, () => {
+  console.log('Serveur démarré sur http://localhost:3000');
+}  );
 module.exports = app;
  
