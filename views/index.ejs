@@ -101,7 +101,7 @@ Appelez-nous au 📞 [0657274965] et lancez votre projet dès aujourd’hui.
       <p class="price"><%= meal.price %> MAD</p>
 
       <!-- Ajouter au panier -->
-      <form action="/orders/cart/add#cart" method="POST">
+      <form action="/orders/cart/add" method="POST">
   <input type="hidden" name="mealId" value="<%= meal._id %>">
   <input type="number" name="quantity" value="1" min="1">
   <button type="submit">🛒 Ajouter au panier</button>
@@ -113,7 +113,7 @@ Appelez-nous au 📞 [0657274965] et lancez votre projet dès aujourd’hui.
 </section>
 
   <!-- Panier -->
-  <section class="cart"  id="cart">
+  <section class="cart" >
     <h3>🛒 Mon panier</h3>
     <% if (cart.length > 0) { %>
       <ul>
@@ -264,15 +264,7 @@ navItems.forEach(item => {
     document.body.classList.remove("no-scroll");
   }
 </script>
-<script>
-  // Vérifie si l’URL contient #cart
-  if (window.location.hash === "#cart") {
-    const cartSection = document.getElementById("cart");
-    if (cartSection) {
-      cartSection.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-</script>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {

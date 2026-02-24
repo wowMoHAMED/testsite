@@ -41,7 +41,7 @@ next();
 
 
 // connexion MongoDB
-mongoose.connect("mongodb+srv://chiguermohamed41_db_user:OOMQ6cPkqQL4hsmB@cluster23.nlm4h2d.mongodb.net/?appName=Cluster23")
+mongoose.connect(process.env.MONGODB_URL)
 .then(()=> console.log("MongoDB connecté"));
 
 // Routes 
@@ -272,22 +272,23 @@ app.use(express.json());
 
 
   // body.cart devrait maintenant contenir tous les items
-
 const commRoutes = require("./api/comm");
 app.use("/api/comm", commRoutes);
+
 app.get("/checkout", (req, res) => {
-  res.render("checkout", {
-    cart: [],
-    cartTotal: 0
-  }); 
+  const cart = req.session.cart || [];
+  const cartTotal = cart.reduce((sum, item) => sum + (item.lineTotal || 0), 0);
+
+  res.render("checkout", { 
+    cart,
+    cartTotal
+  });
 });
 
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
 
-app.listen(3000, () => {
-  console.log('Serveur démarré sur http://localhost:3000');
-}  );
+
 module.exports = app;
  
