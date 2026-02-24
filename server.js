@@ -267,11 +267,11 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+ 
 // routes
 // //IMPORTANT POUR VERCEL
 
-
+/*
 
 
 app.get("/comm/cominfo", async (req, res) => {
@@ -284,8 +284,9 @@ app.get("/comm/cominfo", async (req, res) => {
   }
 });
 
-
+*/
 /* pdf*/
+/*
 const PDFDocument = require("pdfkit");
 
 
@@ -329,7 +330,7 @@ app.get("/comm/cominfo/pdf", async (req, res) => {
     res.status(500).send("Erreur lors de la génération du PDF");
   }
 });
-
+*/
 
   // body.cart devrait maintenant contenir tous les items
 
@@ -337,17 +338,15 @@ const commRoutes = require("./api/comm");
 app.use("/api/comm", commRoutes);
 app.get("/checkout", (req, res) => {
   res.render("checkout", {
-    cart: [],
-    cartTotal: 0
+  
   }); 
 });
 
 app.get("/commande-reussie", (req, res) => {
   res.render("commande-reussie");
 });
-app.listen(3000, () => {
-  console.log("Serveur démarré sur http://localhost:3000");
-});
+
+
 module.exports = app; 
 
  

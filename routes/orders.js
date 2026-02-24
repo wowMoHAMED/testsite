@@ -1,15 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const Commande = require('../models/Commande');   // ✅ ton vrai modèle
+const Order = require('../models/Order');
 const Meal = require('../models/Meal');
 const PDFDocument = require('pdfkit');
+const cloudinary = require("../config/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-// Ajouter au panier (stocké en session)
+
+// Admin: list orders
+router.get('/admin', async (req, res) => {
+  const orders = await Order.find().sort({ createdAt: -1 });
+  res.render('layout', { content: `
+    <h2>Orders (Admin)</h2>
+    <ul>
+      ${orders.map(o => `
+        <li>
+          ${o.mealName} — Qty: ${o.quantity} — Total: ${o.totalPrice} MAD
+          — ${new Date(o.createdAt).toLocaleString()}
+        </li>
+      `).join('')}
+    </ul>
+  `});
+});
+
+// Count orders (global)
+router.get('/count', async (req, res) => {
+  const count = await Order.countDocuments();
+  res.send(`Total orders: ${count}`);
+});
+
+// Add to cart (stores in session)
 router.post('/cart/add', async (req, res) => {
   try {
     const { mealId, quantity } = req.body;
     const meal = await Meal.findById(mealId);
-    if (!meal) return res.send('Produit introuvable');
+    if (!meal) return res.send('Meal not found');
 
     const qty = Number(quantity) || 1;
     const lineTotal = qty * meal.price;
@@ -17,21 +42,21 @@ router.post('/cart/add', async (req, res) => {
     if (!req.session.cart) req.session.cart = [];
     req.session.cart.push({
       mealId: meal._id,
-      mealName: meal.name,
+      mealName: meal.name, 
       image: meal.image,
       quantity: qty,
       unitPrice: meal.price,
       lineTotal
     });
 
-    res.redirect('/#cart');   // ✅ redirige vers la section panier
+    res.redirect('/');
   } catch (err) {
-    console.error('Erreur ajout panier', err);
+    console.error('Error adding to cart', err);
     res.status(500).send('Erreur interne');
   }
 });
 
-// Supprimer un produit du panier
+// Remove item from cart by index
 router.post('/cart/remove', (req, res) => {
   try {
     const idx = parseInt(req.body.index, 10);
@@ -40,21 +65,59 @@ router.post('/cart/remove', (req, res) => {
     if (idx >= 0 && idx < req.session.cart.length) {
       req.session.cart.splice(idx, 1);
     }
-    res.redirect('/#cart');
+    res.redirect('/');
   } catch (err) {
-    console.error('Erreur suppression panier', err);
+    console.error('Error removing from cart', err);
     res.status(500).send('Erreur interne');
   }
 });
 
-// Page checkout
+const mongoose = require('mongoose');
+
+// Schema commande
+const orderSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  address: String, 
+  email: String,
+  phone: String,
+  postalCode: String,
+  cart: Array,
+  total: Number,
+  paymentType: String,
+  orderNumber: Number,
+  createdAt: { type: Date, default: Date.now }
+});
+
+
+const path = require('path');
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+
+    let resourceType = "image";
+
+    // si le fichier est une vidéo
+    if (file.mimetype.startsWith("video")) {
+      resourceType = "video";
+    }
+
+    return {
+      folder: "restaurant",
+      resource_type: resourceType
+    };
+  }
+});
+
+
+// Checkout page
 router.get('/checkout', (req, res) => {
   const cart = req.session.cart || [];
   const cartTotal = cart.reduce((sum, item) => sum + Number(item.lineTotal), 0);
   res.render('checkout', { cart, cartTotal });
 });
 
-// Validation de commande
 router.post('/checkout', async (req, res) => {
   try {
     const { firstName, lastName, address, email, phone, postalCode, paymentType } = req.body;
@@ -63,11 +126,11 @@ router.post('/checkout', async (req, res) => {
 
     const cartTotal = cart.reduce((sum, item) => sum + item.lineTotal, 0);
 
-    // Compter les commandes existantes
-    const count = await Commande.countDocuments();
+    // ✅ compter les commandes existantes
+    const count = await Order.countDocuments();
 
-    // Créer une nouvelle commande
-    const newCommande = await Commande.create({
+    // ✅ créer la nouvelle commande avec numéro incrémenté
+    const newOrder = await Order.create({
       firstName,
       lastName,
       address,
@@ -76,20 +139,31 @@ router.post('/checkout', async (req, res) => {
       postalCode,
       cart,
       total: cartTotal,
-      orderNumber: count + 1,
-      paymentType
+      orderNumber: count + 1 , 
+      paymentType  
+       // ← numéro clair
     });
 
-    // Vider le panier
     req.session.cart = [];
 
-    // Afficher confirmation
-    res.render('commande-reussie', {
-      order: newCommande
+    res.render('confirm', {
+      firstName,
+      lastName,
+      address,
+      email,
+      phone,
+      postalCode,
+      cart,
+      paymentType,
+      order: req.session.order,
+      total: cartTotal,
+      createdAt: newOrder.createdAt,
+      orderNumber: newOrder.orderNumber 
+      // ← numéro lisible
     });
 
   } catch (err) {
-    console.error('Erreur lors du checkout', err);
+    console.error('Erreur lors de la sauvegarde de la commande', err);
     res.status(500).send('Erreur interne');
   }
 });
@@ -97,54 +171,19 @@ router.post('/checkout', async (req, res) => {
 // Page commandes admin
 router.get('/commandes', async (req, res) => {
   try {
-    const commandes = await Commande.find().sort({ createdAt: -1 });
-    res.render('cominfo', { commandes });
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.render('commandes', { orders });
   } catch (err) {
     console.error(err);
     res.status(500).send('Erreur serveur');
   }
 });
 
-// Exporter en PDF
-router.get('/commandes/pdf', async (req, res) => {
-  try {
-    const commandes = await Commande.find().sort({ createdAt: -1 });
 
-    const doc = new PDFDocument();
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "attachment; filename=commandes.pdf");
+const multer = require("multer");
 
-    doc.pipe(res);
-
-    doc.fontSize(18).text("Liste des commandes", { align: "center" });
-    doc.moveDown();
-
-    commandes.forEach(cmd => {
-      doc.fontSize(14).text(`Client: ${cmd.firstName} ${cmd.lastName}`);
-      doc.text(`Adresse: ${cmd.address}`);
-      doc.text(`Email: ${cmd.email}`);
-      doc.text(`Téléphone: ${cmd.phone}`);
-      doc.text(`Code postal: ${cmd.postalCode}`);
-      doc.text(`Numéro de commande: ${cmd.orderNumber}`);
-      doc.text(`Date: ${new Date(cmd.createdAt).toLocaleString()}`);
-      doc.text(`Paiement: ${cmd.paymentType}`);
-      doc.moveDown();
-
-      doc.text("Produits:");
-      cmd.cart.forEach(item => {
-        doc.text(`- ${item.mealName} | Qté: ${item.quantity} | Prix: ${item.lineTotal} MAD`);
-      });
-
-      doc.moveDown();
-      doc.text(`Total: ${cmd.total} MAD`, { underline: true });
-      doc.moveDown().moveDown();
-    });
-
-    doc.end();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erreur PDF");
-  }
-});
+module.exports = multer({ storage });
+// Exemple d’ajout au panier pour test
 
 module.exports = router;
+ 
